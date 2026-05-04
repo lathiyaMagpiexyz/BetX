@@ -1,0 +1,331 @@
+{
+  "$comment": "Declarative cross-file coherence rules consumed by .claude/scripts/verify-linter.sh. Each rule is a static-analysis assertion across template files. Findings are reported as CROSS_FILE_CONTRADICTION category and folded into observation-phase Step 5b-coherence. Rule types: field_role_map, artifact_lifecycle, verdict_vocab_consistency (AOC v1 R1), ledger_ownership (AOC v1 R2), consumer_coverage (AOC v1 R3), internal_href_validity (#1069 cross-agent fixture contract). See .claude/patterns/coherence-rule-schema.json for per-type shape.",
+  "rules": [
+    {
+      "id": "golden-path-role-map",
+      "type": "field_role_map",
+      "severity": "block",
+      "field": "golden_path",
+      "canonical_function": "derive_scope_pages",
+      "description": "SCOPE consumers (count-based / set-based access) must call derive_scope_pages() rather than reading golden_path directly. FUNNEL consumers (sequence/order-based access) declare a coherence-allow pragma. Count-based regex (len(golden_path), set(golden_path)) is forbidden unconditionally — pragma cannot whitelist these. See #1024.",
+      "consumers": [
+        ".claude/skills/bootstrap/state-11c-page-scaffold.md",
+        ".claude/skills/change/state-11a-verify-prep.md",
+        ".claude/agents/gate-keeper.md",
+        ".claude/agents/spec-reviewer.md",
+        ".claude/agents/scaffold-pages.md",
+        ".claude/agents/performance-reporter.md",
+        ".claude/procedures/scaffold-pages.md",
+        ".claude/procedures/accessibility-scanner.md",
+        ".claude/skills/verify/state-0-read-context.md",
+        ".claude/stacks/auth/supabase.md",
+        ".claude/procedures/wire.md",
+        ".claude/procedures/ux-journeyer.md",
+        ".claude/procedures/behavior-verifier.md",
+        ".claude/agents/ux-journeyer.md",
+        ".claude/agents/accessibility-scanner.md",
+        ".claude/stacks/testing/playwright.md",
+        ".claude/stacks/distribution/google-ads.md"
+      ]
+    },
+    {
+      "id": "golden-path-consumer-discovery",
+      "type": "discover_consumers",
+      "severity": "warn",
+      "field": "golden_path",
+      "against_rule": "golden-path-role-map",
+      "description": "Grep-discovers files mentioning golden_path in a consumption context; WARNs on drift between grep-found set and golden-path-role-map consumers list. Non-blocking — real violations are caught by golden-path-role-map. See #1024 follow-up.",
+      "path_excludes": [
+        ".claude/templates/",
+        ".claude/patterns/template-coherence-rules.json",
+        ".claude/patterns/fix-log/",
+        ".claude/patterns/solve-reasoning.md",
+        ".claude/patterns/observation-phase.md",
+        ".claude/patterns/verdict-ledger-rules.md",
+        ".claude/patterns/tdd.md",
+        ".claude/patterns/verify.md",
+        ".claude/patterns/state-registry.json",
+        ".claude/patterns/agent-trace-protocol.md",
+        ".claude/scripts/lib/derive_pages.py",
+        ".claude/scripts/migrate-experiment-yaml.py",
+        ".claude/scripts/validate-behavior-pages.py",
+        ".claude/scripts/verify-linter.sh",
+        ".claude/scripts/tests/",
+        ".claude/skills/solve/",
+        ".claude/skills/change/state-2-read-context.md",
+        ".claude/skills/spec/state-4-golden-path.md",
+        ".claude/skills/spec/state-6-stack-funnel.md",
+        ".claude/skills/bootstrap/state-5-present-plan.md",
+        ".claude/skills/bootstrap/state-15-scan-and-classify.md",
+        ".claude/skills/distribute/state-3-implement.md",
+        ".claude/skills/distribute/state-4-generate.md",
+        ".claude/archetypes/web-app.md",
+        ".claude/agent-prompt-footer.md",
+        ".claude/worktrees/",
+        ".runs/",
+        "memory/"
+      ],
+      "consumption_patterns": [
+        "\\.get\\(['\"]golden_path",
+        "yaml\\.safe_load[^\\n]{0,200}golden_path",
+        "experiment\\.golden_path",
+        "experiment\\[['\"]golden_path['\"]\\]",
+        "for\\s+\\w+\\s+in\\s+[^\\n]{0,100}golden_path",
+        "\\bgolden_path\\s*\\[",
+        "from\\s+experiment\\.yaml[^\\n]{0,100}golden_path",
+        "experiment\\.yaml[^\\n]{0,200}\\bgolden_path\\b",
+        "reads?\\s+[^\\n]{0,100}golden_path",
+        "\\bgolden_path\\s+page\\b",
+        "golden_path\\s+step",
+        "each\\s+[^\\n]{0,50}golden_path"
+      ]
+    },
+    {
+      "id": "aoc-verdict-vocab-consistency",
+      "type": "verdict_vocab_consistency",
+      "severity": "block",
+      "registry_path": ".claude/patterns/agent-registry.json",
+      "agent_files_glob": ".claude/agents/*.md",
+      "predicate_file": ".claude/scripts/evaluate-hard-gate-predicates.py",
+      "description": "AOC v1 R1: per-agent verdict declarations in .claude/agents/*.md must use only values from verdict_agents_schema.<agent>.allowed_verdicts (lowercase: pass/fail/blocked/unresolved). result qualifiers must come from allowed_results. evaluate-hard-gate-predicates.py functions must reference only verdict values declared in the registry. Catches drift like #1044 (agent emits 'all fixed' while gate keys on 'pass')."
+    },
+    {
+      "id": "aoc-fix-ledger-ownership",
+      "type": "ledger_ownership",
+      "severity": "block",
+      "allowed_writers": [
+        ".claude/scripts/write-fix-ledger.py",
+        ".claude/scripts/render-fix-log.py",
+        ".claude/skills/verify/state-0-read-context.md",
+        ".claude/skills/verify/state-5-e2e-tests.md"
+      ],
+      "_transitional_note": "state-0 (init with empty header) and state-5 (inline e2e/spec fix entries) are allowed during the AOC v1 transition period. Follow-up observation to migrate state-5 e2e/spec fix writes through a proper agent trace so the renderer can own fix-log.md outright.",
+      "gated_paths": [
+        ".runs/fix-ledger.jsonl",
+        ".runs/fix-log.md"
+      ],
+      "description": "AOC v1 R2: fix-ledger.jsonl and fix-log.md may only be written by the canonical writers. Catches any template file or script that writes directly to either path (e.g., echo >> .runs/fix-log.md, open('.runs/fix-log.md','a')). Complemented at runtime by .claude/hooks/fix-ledger-write-guard.sh."
+    },
+    {
+      "id": "aoc-consumer-coverage",
+      "type": "consumer_coverage",
+      "severity": "block",
+      "canonical_source": ".runs/fix-ledger.jsonl",
+      "consumers": [
+        ".claude/agents/pattern-classifier.md",
+        ".claude/scripts/write-q-score.py",
+        ".claude/scripts/check-artifact-presence.py",
+        ".claude/scripts/check-cross-artifact-consistency.py",
+        ".claude/hooks/verify-report-gate.sh",
+        ".claude/patterns/state-registry.json",
+        ".claude/hooks/lib-verdict-consistency.sh",
+        ".claude/hooks/lib-artifacts.sh",
+        ".claude/scripts/compliance-audit.py",
+        ".claude/hooks/patterns-saved-gate.sh",
+        ".claude/hooks/skill-agent-gate.sh"
+      ],
+      "description": "AOC v1 R3: every fix-count consumer must reference fix-ledger.jsonl as canonical source (closes #1048). Consumers that regex fix-log.md without also referencing the ledger are flagged as stale."
+    },
+    {
+      "id": "aoc-frontmatter-artifact-consistency",
+      "type": "frontmatter_artifact_consistency",
+      "severity": "block",
+      "schema_path": ".claude/patterns/verify-report-frontmatter.json",
+      "writer": ".claude/skills/verify/state-7a-write-report.md",
+      "consumers": [
+        ".claude/scripts/write-q-score.py",
+        ".claude/scripts/check-cross-artifact-consistency.py",
+        ".claude/scripts/lifecycle-finalize.sh",
+        ".claude/scripts/check-observation-artifacts.sh",
+        ".claude/scripts/validate-recovery.sh",
+        ".claude/hooks/verify-pr-gate.sh",
+        ".claude/patterns/state-registry.json",
+        ".claude/patterns/q-score.md",
+        ".claude/patterns/observation-phase.md"
+      ],
+      "description": "AOC v1.1 R4 (closes #1056): the verify-report.md frontmatter schema declares 13 fields. The writer (state-7a-write-report.md) must emit every declared field, and every consumer must reference only declared field names. Catches the producer-vs-consumer drift class for frontmatter — analogous to R3 for ledger. Also detects stale consumer field-name typos via edit-distance heuristic (e.g., build_attempt vs build_attempts, fix_log_count vs fix_log_entries)."
+    },
+    {
+      "id": "internal-href-validity",
+      "type": "internal_href_validity",
+      "severity": "warn",
+      "scaffold_glob": "src/app/**/*.tsx,src/app/**/*.ts,src/components/**/*.tsx",
+      "route_owner_hints": [
+        {"route_prefix": "/portfolio/", "fixture_candidates": ["src/app/portfolio/cases.ts", "src/app/portfolio/cases.tsx"]},
+        {"route_prefix": "/projects/", "fixture_candidates": ["src/app/projects/projects.ts"]},
+        {"route_prefix": "/catalog/", "fixture_candidates": ["src/app/catalog/items.ts"]},
+        {"route_prefix": "/invoices/", "fixture_candidates": ["src/app/invoices/invoices.ts"]},
+        {"route_prefix": "/quotes/", "fixture_candidates": ["src/app/quotes/quotes.ts"]}
+      ],
+      "description": "#1069 cross-agent fixture contract: walks scaffold-emitted files for href=\"/<route>/<slug-or-id>\" patterns; for each route matching a configured prefix, parses the canonical fixture file and verifies every referenced identifier appears as a literal string. Emits cross_file_contradiction findings for fabricated IDs that do not match the owning agent's canonical fixture. WARN severity — primary fix is the Key Constraints in scaffold-landing.md + scaffold-pages.md; this rule is defense-in-depth. Route-owner hints are a canonical but non-exhaustive mapping; projects with novel list-type pages extend this list or rely on the agent-level contract alone."
+    },
+    {
+      "id": "pages-no-payload-type-exports",
+      "type": "pages_no_payload_type_exports",
+      "severity": "warn",
+      "_transitional_note": "Severity is intentionally `warn` for the introduction phase (see #1161 fix PR). Existing bootstrapped projects may have pre-existing payload-shape type declarations in pages; ship as warn to surface findings without blocking /change for projects mid-flight. Tighten to `block` in a follow-up PR after a quiet period when grep across known projects shows zero pre-existing violations.",
+      "scope_glob": "src/app/**/*.tsx",
+      "path_excludes": [
+        "src/app/api/**",
+        "**/__tests__/**"
+      ],
+      "filename_excludes": [
+        "layout.tsx",
+        "loading.tsx",
+        "error.tsx",
+        "not-found.tsx",
+        "default.tsx",
+        "template.tsx",
+        "*.test.tsx",
+        "*.stories.tsx"
+      ],
+      "types_source_path": "src/lib/types.ts",
+      "description": "#1161 (b) defense-in-depth: pages must not declare payload-shape types (suffix Payload/Response/Request/Schema, exported or local) or types whose names collide with src/lib/types.ts exports. Pages must import from @/lib/types (canonical project-types file produced by scaffold-libs initial via supabase stack files: list and augmented by scaffold-wire per wire.md Step 6). The rule fires at bootstrap finalize and /change PR coherence pass. Currently `warn` severity for safe rollout — tighten to `block` once existing-project migration is complete."
+    },
+    {
+      "id": "artifact-transience-bootstrap",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "bootstrap",
+      "description": "Validate transient lifecycle declarations in registry[bootstrap] entries against actual deletion sources. Closes #1162 recurrence."
+    },
+    {
+      "id": "artifact-transience-verify",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "verify"
+    },
+    {
+      "id": "artifact-transience-change",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "change"
+    },
+    {
+      "id": "artifact-transience-review",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "review"
+    },
+    {
+      "id": "artifact-transience-resolve",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "resolve"
+    },
+    {
+      "id": "artifact-transience-distribute",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "distribute"
+    },
+    {
+      "id": "artifact-transience-iterate-check",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "iterate-check"
+    },
+    {
+      "id": "artifact-transience-solve",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "solve"
+    },
+    {
+      "id": "artifact-transience-observe",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "observe"
+    },
+    {
+      "id": "artifact-transience-upgrade",
+      "type": "artifact_transience",
+      "severity": "block",
+      "skill": "upgrade"
+    },
+    {
+      "id": "executor-enforcement",
+      "type": "executor_enforcement",
+      "severity": "block",
+      "manifest_path": ".claude/patterns/lead-only-artifacts.json",
+      "description": "Three-way mapping check for lead-only artifacts (closes #1152): hook coverage + schema field declared + no agent .md lists artifact as deliverable."
+    },
+    {
+      "id": "earc-gate-evidence-escape",
+      "type": "gate_evidence_escape",
+      "severity": "block",
+      "inventory_path": ".claude/patterns/gate-inventory.json",
+      "registry_path": ".claude/patterns/state-registry.json",
+      "description": "EARC (closes #1182, #1189 recurrence): every gate listed in gate-inventory.json with earc_subpattern in {gate-side, writer-side} must offer a documented evidence-escape branch (inline reference to attestation/EARC/lead_evidence_source) or be declared in state-registry.repair_evidence.",
+      "_comment": "Slice 1 (#1203): shipped in WARN. Slice 4b: flipped to BLOCK once gate-inventory.json showed zero unhandled findings — the two reported instances are wired via slices 1 + 3, and any new gate added with earc_subpattern in {gate-side, writer-side} but lacking an escape will now fail the linter."
+    },
+    {
+      "id": "graim-gate-artifact-identity",
+      "type": "gate_artifact_identity",
+      "severity": "warn",
+      "manifest_path": ".claude/patterns/gate-readable-artifacts-canonical.json",
+      "enforced_artifacts": [
+        ".runs/iterate-check-context.json",
+        ".runs/review-context.json",
+        ".runs/spec-context.json",
+        ".runs/upgrade-context.json",
+        ".runs/verify-lifecycle.json",
+        ".runs/agent-traces/scaffold-pages.json",
+        ".runs/pipeline-phase.json",
+        ".runs/trace-migration-unresolved.json"
+      ],
+      "description": "GRAIM v2 C1+C2 — warn when a VERIFY reading an enforced gate-readable artifact lacks identity assertion. enforced_artifacts grows in Slice 3. Slice 3.1 added 5 init-context-style artifacts. Slice 3.2 added 3 non-context artifacts; .runs/deploy-provision-3b.json is enrolled in the canonical manifest (writer migrated) but held back from this allowlist because its consumer is verify-deploy-3b.py (a wrapper script, not an inline VERIFY string), so identity enforcement would emit a structural false-positive without a state-registry.json edit."
+    },
+    {
+      "id": "graim-boundary-kind-required",
+      "type": "boundary_kind_required",
+      "severity": "warn",
+      "enforced_artifacts": [".runs/agent-traces/design-critic-*.json"],
+      "description": "GRAIM v2 C3 — warn when a fast-path branch emits a boundary-emitting artifact without gating on boundary_kind == diff."
+    },
+    {
+      "id": "graim-gate-artifact-discovery",
+      "type": "gate_artifact_discovery",
+      "severity": "warn",
+      "manifest_path": ".claude/patterns/gate-readable-artifacts-canonical.json",
+      "description": "GRAIM v2 — permanent warn-only auto-discovery: flag .runs/*.json paths that are gate-read but not in the canonical manifest (promotion regression catch)."
+    },
+    {
+      "id": "stack-files-env-gated-must-have-production-observability",
+      "type": "must_contain_section",
+      "severity": "block",
+      "applies_to_glob": ".claude/stacks/**/*.md",
+      "required_section": "## Production Observability",
+      "trigger_pattern_any": [
+        "\\?\\?\\s*[\"']phc_TEAM_KEY[\"']",
+        "\\|\\|\\s*[\"']placeholder-stripe-publishable[\"']",
+        "\\|\\|\\s*[\"']placeholder-anon-key[\"']",
+        "\\|\\|\\s*[\"']https://placeholder\\.supabase\\.co[\"']"
+      ],
+      "exclude_glob": [
+        ".claude/stacks/TEMPLATE.md",
+        ".claude/stacks/_archive/**"
+      ],
+      "description": "Issue #1170 lineage: stack files prescribing env-gated source code with literal placeholder fallbacks (e.g. ?? \"phc_TEAM_KEY\", || \"placeholder-stripe-publishable\") MUST include a `## Production Observability` section documenting the fail-loud contract. Without it the silent-fallback antipattern recurs. See .claude/stacks/TEMPLATE.md for the section requirements."
+    },
+    {
+      "id": "bash-hook-write-operator-binding",
+      "type": "bash_hook_write_operator_binding",
+      "severity": "block",
+      "manifest_path": ".claude/patterns/write-guard-hooks.json",
+      "scan_glob": ".claude/hooks/*.sh,.claude/scripts/**/*.sh",
+      "pragma": "# coherence-allow: unbound-fastpath",
+      "convention_doc": ".claude/patterns/bound-target-write-guard.md",
+      "description": "Issue #1236 — class-level prevention for the unbound-co-occurrence regex anti-pattern that has recurred 7 times (#1023, #1045, #1064, #1123, #1185, #1223, #1230). Phase 1 verifies every entry in write-guard-hooks.json points at an existing hook whose source contains the protected_path_regex literal (proving it is referenced inside a bound-target match()) and references every declared write_operator. Phase 2 scans .claude/hooks/*.sh and .claude/scripts/**/*.sh for the historical anti-pattern shapes (`grep -qE '<op>.*<path>'` and `awk '/path/ && /(op)/'`) and flags any match in an unregistered hook as 'must register'."
+    },
+    {
+      "id": "markdown-cross-file-line-reference",
+      "type": "markdown_cross_file_line_reference",
+      "severity": "block",
+      "target_glob": ".claude/{stacks,skills,agents,patterns,templates}/**/*.md",
+      "pragma": "<!-- coherence-allow: line-number-cross-reference -->",
+      "convention_doc": ".claude/patterns/cross-reference-style.md",
+      "description": "Issue #1238 — flags stale line-number cross-references in template markdown. Branch 1 (cross-file) emits when a line-number qualifier (`(line N)`, `lines N-M`, `L\\d+-\\d+`, `on line N`) co-occurs within a 3-line window with a path-mention to a template-eligible file (extensions: md, yaml, yml, json, py, sh; src/-prefixed paths excluded since src/ is scaffold-emitted). Branch 2 (same-file) emits when the qualifier appears with no path-mention in the 3-line window — covers self-references that rot when the same file is edited. Pragma <!-- coherence-allow: line-number-cross-reference --> on the same or adjacent line suppresses both branches."
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+name: Stack Knowledge Validate
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    # HC1: this workflow is a no-op on downstream forks so the migration lint
+    # and cross-file hash uniqueness check only fire against the template repo.
+    if: github.repository == 'magpiexyz-lab/mvp-template'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python dependencies
+        run: pip3 install pyyaml pytest
+
+      - name: Parser tests
+        run: python3 -m pytest scripts/test_stack_knowledge_parser.py -v --tb=short
+
+      - name: Per-file validate (schema + forbidden-heading lint + within-file uniqueness)
+        shell: bash
+        run: |
+          shopt -s globstar nullglob
+          all_files=(.claude/stacks/**/*.md)
+          # Filter out archive files (*.archive.md) — they are historical docs, not live entries.
+          files=()
+          for f in "${all_files[@]}"; do
+            case "$f" in
+              *.archive.md) ;;
+              *) files+=("$f") ;;
+            esac
+          done
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No live stack files found — skipping."
+            exit 0
+          fi
+          python3 scripts/validate-stack-knowledge.py "${files[@]}"
+
+      - name: Cross-file uniqueness
+        run: python3 scripts/ci-check-stack-knowledge.py
+
+      - name: Convergence config validate
+        run: python3 scripts/validate-convergence-config.py
