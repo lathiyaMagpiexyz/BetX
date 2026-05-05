@@ -290,6 +290,7 @@ clean: ## Remove generated files (lets you re-run bootstrap)
 	rm -rf tests vitest.config.ts                          # testing/vitest
 	rm -rf public docs                                     # bootstrap-generated assets and docs
 	rm -rf public/images                                   # images/fal
+	rm -rf contracts/out contracts/cache contracts/broadcast indexer/.ponder indexer/node_modules  # web3/evm
 	rm -rf .runs .verify-baseline                          # skill execution state
 	rm -rf .vercel                                         # Vercel CLI config
 	rm -f vercel.json tsconfig.tsbuildinfo                 # deploy and build config
