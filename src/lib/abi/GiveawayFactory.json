@@ -1,0 +1,87 @@
+[
+  {
+    "type": "function",
+    "name": "create",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "prizeToken", "type": "address" },
+      {
+        "name": "tiers",
+        "type": "tuple[]",
+        "components": [
+          { "name": "rank", "type": "uint8" },
+          { "name": "amount", "type": "uint256" }
+        ]
+      },
+      { "name": "entryFee", "type": "uint256" },
+      { "name": "endAt", "type": "uint64" }
+    ],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "entryToken",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "getAllGiveaways",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address[]" }]
+  },
+  {
+    "type": "function",
+    "name": "giveawaysCount",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "giveaways",
+    "stateMutability": "view",
+    "inputs": [{ "name": "index", "type": "uint256" }],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "rescueTokens",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "token", "type": "address" },
+      { "name": "to", "type": "address" },
+      { "name": "amount", "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "event",
+    "name": "GiveawayCreated",
+    "inputs": [
+      { "indexed": true, "name": "giveaway", "type": "address" },
+      { "indexed": true, "name": "sponsor", "type": "address" },
+      { "indexed": true, "name": "prizeToken", "type": "address" },
+      { "indexed": false, "name": "entryFee", "type": "uint256" },
+      { "indexed": false, "name": "endAt", "type": "uint64" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "TokensRescued",
+    "inputs": [
+      { "indexed": true, "name": "token", "type": "address" },
+      { "indexed": true, "name": "to", "type": "address" },
+      { "indexed": false, "name": "amount", "type": "uint256" }
+    ]
+  }
+]

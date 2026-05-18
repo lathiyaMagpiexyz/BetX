@@ -178,7 +178,7 @@ export const wagmiConfig = isDemoWeb3
       ssr: true,
     })
   : getDefaultConfig({
-      appName: "BetX Giveaways",
+      appName: "LottoBlast",
       projectId: wcProjectId,
       chains: [targetChain],
       transports: {
@@ -189,7 +189,7 @@ export const wagmiConfig = isDemoWeb3
       },
       connectors: [
         injected({ shimDisconnect: true }),
-        coinbaseWallet({ appName: "BetX Giveaways" }),
+        coinbaseWallet({ appName: "LottoBlast" }),
         walletConnect({ projectId: wcProjectId }),
       ],
       ssr: true,

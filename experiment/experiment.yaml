@@ -1,6 +1,6 @@
-# experiment.yaml — BetX Giveaways MVP
+# experiment.yaml — LottoBlast MVP
 #
-# Phase 1 of the BetX platform: Crypto giveaway campaigns.
+# Phase 1 of the LottoBlast platform: Crypto giveaway campaigns.
 # Sponsors lock prize tokens in an escrow contract → users enter via wallet →
 # Chainlink VRF picks winners on close → prizes auto-distributed by tier.
 #
@@ -13,8 +13,8 @@
 # connect IS the auth.
 
 # --- 1. Identity ---
-name: betx-giveaways
-owner: betx
+name: lottoblast
+owner: lottoblast
 type: web-app
 level: 3                        # Full product: wallet auth + on-chain settlement + complete user + sponsor flows
 status: draft
@@ -23,7 +23,7 @@ status: draft
 description: |
   Crypto projects that want to grow their community run giveaways on Twitter and
   Discord — but those are opaque, manually drawn, and frequently rigged or
-  farmed by insiders. BetX Giveaways lets a sponsor lock prize tokens in an
+  farmed by insiders. LottoBlast lets a sponsor lock prize tokens in an
   escrow contract, set tiered prizes (e.g. 1st $300, 2nd $200, 3rd $100) plus
   a fixed entry fee in USDC (e.g. 1 USDC), and have winners drawn provably-fair
   by Chainlink VRF with prizes auto-distributed on-chain.
@@ -46,7 +46,7 @@ target_user: |
 
 distribution: |
   - Crypto Twitter (CT) — partner with one mid-tier token project for a
-    "first BetX giveaway" launch with cross-promotion.
+    "first LottoBlast giveaway" launch with cross-promotion.
   - Farcaster — frame-based entry CTA in the launch post.
   - Discord communities of Base/Polygon projects (announce in 5-10 server
     #partnerships channels with sponsor approval).
@@ -120,7 +120,7 @@ behaviors:
   - id: b-01
     hypothesis_id: h-01
     pages: [landing]
-    given: "A visitor arrives at the BetX Giveaways landing page"
+    given: "A visitor arrives at the LottoBlast landing page"
     when: "They read the value prop (verifiable, auto-pay, low gas) and see active giveaways"
     then: "They click 'Connect Wallet' or 'Browse Giveaways' (>8% of visitors)"
     tests:
@@ -223,7 +223,7 @@ behaviors:
     hypothesis_id: h-04
     pages: [profile, giveaways]
     given: "A wallet that previously entered a giveaway has won (or lost) and the campaign has resolved"
-    when: "They return to BetX within 14 days and visit /profile or /giveaways"
+    when: "They return to LottoBlast within 14 days and visit /profile or /giveaways"
     then: "They see resolved status + any unclaimed prizes prominently, with a one-click Claim or a 'Browse new giveaways' nudge"
     tests:
       - "Returning users see a 'Welcome back' banner with their result summary"
@@ -320,7 +320,6 @@ web3:
       - GiveawayFactory
       - Giveaway
       - VRFConsumer
-      - Treasury
   oracle:
     randomness: chainlink-vrf-v2
     data_feeds: none           # Phase 1 has no price feeds; Phase 2 (prediction markets) will add them
