@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================================================
+   LottoBlast palette — dark by default. Casino-jackpot pink → purple → gold.
+   Background is near-black with a deep-purple tint so gradient text and glow
+   effects pop.
+   ============================================================================= */
+
+@layer base {
+  :root {
+    /* Dark is the default theme. */
+    --background: 260 35% 6%;
+    --foreground: 0 0% 98%;
+    --card: 260 30% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 260 30% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 320 90% 60%;            /* magenta */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 260 20% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 260 18% 16%;
+    --muted-foreground: 260 10% 70%;
+    --accent: 45 100% 55%;             /* gold */
+    --accent-foreground: 260 50% 10%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 260 22% 20%;
+    --input: 260 22% 20%;
+    --ring: 320 90% 60%;
+    --radius: 0.75rem;
+
+    --jackpot-pink: 320 95% 62%;
+    --jackpot-purple: 270 85% 55%;
+    --jackpot-gold: 45 100% 58%;
+  }
+
+  /* Opt-in light theme — flip the same tokens, less premium-feeling. */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 260 40% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 260 40% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 40% 10%;
+    --primary: 320 85% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 260 20% 95%;
+    --secondary-foreground: 260 40% 10%;
+    --muted: 260 15% 94%;
+    --muted-foreground: 260 12% 40%;
+    --accent: 45 95% 50%;
+    --accent-foreground: 260 40% 10%;
+    --destructive: 0 80% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 260 15% 88%;
+    --input: 260 15% 88%;
+    --ring: 320 85% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    background-image:
+      radial-gradient(at 20% 0%, hsl(var(--jackpot-purple) / 0.18), transparent 50%),
+      radial-gradient(at 80% 100%, hsl(var(--jackpot-pink) / 0.15), transparent 55%);
+    background-attachment: fixed;
+  }
+}
+
+/* =============================================================================
+   Custom utilities — gradient text, ticket cards, glow buttons, jackpot pulse.
+   ============================================================================= */
+
+@layer utilities {
+  .text-jackpot {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--jackpot-gold)) 0%,
+      hsl(var(--jackpot-pink)) 50%,
+      hsl(var(--jackpot-purple)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% 200%;
+    animation: jackpot-shift 8s ease-in-out infinite;
+  }
+
+  .bg-jackpot {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--jackpot-gold)) 0%,
+      hsl(var(--jackpot-pink)) 50%,
+      hsl(var(--jackpot-purple)) 100%
+    );
+  }
+
+  .glow-pink {
+    box-shadow: 0 0 24px hsl(var(--jackpot-pink) / 0.4),
+      0 0 48px hsl(var(--jackpot-pink) / 0.15);
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 24px hsl(var(--jackpot-gold) / 0.45),
+      0 0 48px hsl(var(--jackpot-gold) / 0.18);
+  }
+
+  /* A real-lottery-ticket card. Perforated edges on left and right via cutouts
+     punched out with the page background colour. */
+  .ticket-card {
+    position: relative;
+    background:
+      linear-gradient(135deg, hsl(var(--card)) 0%, hsl(260 35% 8%) 100%);
+    border-radius: var(--radius);
+    border: 1px solid hsl(var(--border));
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .ticket-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      hsl(var(--jackpot-pink) / 0.06) 40%,
+      hsl(var(--jackpot-purple) / 0.06) 60%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .perforation {
+    background-image: radial-gradient(
+      circle at 4px 50%,
+      hsl(var(--background)) 4px,
+      transparent 4.5px
+    );
+    background-size: 8px 16px;
+    background-repeat: repeat-y;
+  }
+
+  @keyframes jackpot-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes prize-pulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+    50% { transform: scale(1.015); filter: drop-shadow(0 0 16px hsl(var(--jackpot-gold) / 0.5)); }
+  }
+
+  .prize-pulse {
+    animation: prize-pulse 3s ease-in-out infinite;
+  }
+
+  /* Horizontally-scrolling live activity ticker. Pairs of rows are stacked
+     so the loop is seamless — the second copy slides in as the first slides out. */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .marquee {
+    animation: marquee 40s linear infinite;
+  }
+
+  /* Floating lottery balls drifting in the hero background. */
+  @keyframes float-slow {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(8px, -12px) rotate(8deg); }
+    66% { transform: translate(-6px, 6px) rotate(-5deg); }
+  }
+  .float-slow { animation: float-slow 9s ease-in-out infinite; }
+
+  @keyframes float-mid {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(-10px, 12px) rotate(12deg); }
+  }
+  .float-mid { animation: float-mid 6s ease-in-out infinite; }
+
+  /* Subtle gradient sweep across cards on hover. */
+  .shine-on-hover {
+    position: relative;
+    overflow: hidden;
+  }
+  .shine-on-hover::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      hsl(var(--jackpot-pink) / 0.18) 50%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.7s ease;
+    pointer-events: none;
+  }
+  .shine-on-hover:hover::before {
+    transform: translateX(100%);
+  }
+}

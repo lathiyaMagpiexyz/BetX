@@ -63,3 +63,18 @@ coverage/
 # Lock files from other package managers (this project uses npm)
 pnpm-lock.yaml
 yarn.lock
+
+# Foundry (contracts/)
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+!contracts/broadcast/*/run-latest.json
+contracts/lib/
+
+# Ponder indexer
+indexer/.ponder/
+indexer/node_modules/
+.env.contracts
+
+# Local Claude permissions (machine-specific)
+.claude/settings.local.json

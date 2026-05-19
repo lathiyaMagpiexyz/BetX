@@ -1,0 +1,199 @@
+[
+  {
+    "type": "function",
+    "name": "entryFee",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "endAt",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "uint64" }]
+  },
+  {
+    "type": "function",
+    "name": "sponsor",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "prizeToken",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "entryToken",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "prizePool",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "bonusPool",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "hasEntered",
+    "stateMutability": "view",
+    "inputs": [{ "name": "wallet", "type": "address" }],
+    "outputs": [{ "type": "bool" }]
+  },
+  {
+    "type": "function",
+    "name": "unclaimedPrize",
+    "stateMutability": "view",
+    "inputs": [{ "name": "wallet", "type": "address" }],
+    "outputs": [{ "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "unclaimedBonus",
+    "stateMutability": "view",
+    "inputs": [{ "name": "wallet", "type": "address" }],
+    "outputs": [{ "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "getState",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      { "name": "status", "type": "uint8" },
+      { "name": "_entryFee", "type": "uint256" },
+      { "name": "_bonusPool", "type": "uint256" },
+      { "name": "numEntrants", "type": "uint256" },
+      { "name": "numWinners", "type": "uint256" },
+      { "name": "_endAt", "type": "uint64" }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "enter",
+    "stateMutability": "nonpayable",
+    "inputs": [],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "selectWinners",
+    "stateMutability": "nonpayable",
+    "inputs": [{ "name": "selectedWinners", "type": "address[]" }],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "claim",
+    "stateMutability": "nonpayable",
+    "inputs": [],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "cancel",
+    "stateMutability": "nonpayable",
+    "inputs": [],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "rescueTokens",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "token", "type": "address" },
+      { "name": "to", "type": "address" },
+      { "name": "amount", "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "entrants",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "type": "address[]" }]
+  },
+  {
+    "type": "function",
+    "name": "winners",
+    "stateMutability": "view",
+    "inputs": [{ "name": "index", "type": "uint256" }],
+    "outputs": [{ "type": "address" }]
+  },
+  {
+    "type": "event",
+    "name": "Entered",
+    "inputs": [
+      { "indexed": true, "name": "entrant", "type": "address" },
+      { "indexed": false, "name": "feePaid", "type": "uint256" },
+      { "indexed": false, "name": "newBonusPool", "type": "uint256" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "WinnersSelected",
+    "inputs": [
+      { "indexed": false, "name": "winners", "type": "address[]" },
+      { "indexed": false, "name": "amounts", "type": "uint256[]" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "PrizePaid",
+    "inputs": [
+      { "indexed": true, "name": "winner", "type": "address" },
+      { "indexed": false, "name": "amount", "type": "uint256" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "BonusPaid",
+    "inputs": [
+      { "indexed": true, "name": "winner", "type": "address" },
+      { "indexed": false, "name": "amount", "type": "uint256" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "PrizeClaimed",
+    "inputs": [
+      { "indexed": true, "name": "winner", "type": "address" },
+      { "indexed": false, "name": "prizeAmount", "type": "uint256" },
+      { "indexed": false, "name": "bonusAmount", "type": "uint256" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "GiveawayCancelled",
+    "inputs": [
+      { "indexed": true, "name": "sponsor", "type": "address" },
+      { "indexed": false, "name": "prizeRefunded", "type": "uint256" },
+      { "indexed": false, "name": "entryFeesRefunded", "type": "uint256" }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "TokensRescued",
+    "inputs": [
+      { "indexed": true, "name": "token", "type": "address" },
+      { "indexed": true, "name": "to", "type": "address" },
+      { "indexed": false, "name": "amount", "type": "uint256" }
+    ]
+  }
+]

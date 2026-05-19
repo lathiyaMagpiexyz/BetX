@@ -1,154 +1,338 @@
-# experiment.yaml — Describe your experiment
+# experiment.yaml — LottoBlast MVP
 #
-# RECOMMENDED: Run `/spec 'your idea'` in Claude Code — it fills this file
-# automatically with hypotheses, behaviors, variants, and stack choices.
+# Phase 1 of the LottoBlast platform: Crypto giveaway campaigns.
+# Sponsors lock prize tokens in an escrow contract → users enter via wallet →
+# Chainlink VRF picks winners on close → prizes auto-distributed by tier.
 #
-# ALTERNATIVE: Fill in manually. Replace every "TODO" value with your content.
-# See idea/experiment.example.yaml for a complete worked example.
+# Phase 2 (prediction markets) will be added via /change after this MVP validates.
 #
-# When you're done (either way), run: make validate → /bootstrap
+# NOTE: This experiment uses on-chain wallet auth (SIWE / RainbowKit) instead of
+# email/password. A custom stack file will be authored at
+# .claude/stacks/web3/evm.md to describe the EVM/wagmi/viem integration before
+# /bootstrap. `auth: none` here means "no off-chain auth provider" — wallet
+# connect IS the auth.
 
 # --- 1. Identity ---
-name: my-experiment          # Lowercase slug, hyphens only (e.g., "quick-bill"). Used in analytics.
-# type: web-app               # Product archetype (default: web-app). See .claude/archetypes/
-# level: 2                    # Experiment scope: 1 (Pitch), 2 (Prototype), 3 (Product).
-                               # /spec sets this automatically. Manual: omit to let /bootstrap infer from stack.
+name: lottoblast
+owner: lottoblast
+type: web-app
+level: 3                        # Full product: wallet auth + on-chain settlement + complete user + sponsor flows
 status: draft
-# quality: production is always active (TDD, per-task implementer, spec review).
-                               # This field is reserved for future use. Do not set quality: mvp.
 
 # --- 2. Intent ---
 description: |
-  TODO: Describe the problem and your proposed solution in 2-3 sentences.
-  Who has this problem? What does the user get that they don't have today?
+  Crypto projects that want to grow their community run giveaways on Twitter and
+  Discord — but those are opaque, manually drawn, and frequently rigged or
+  farmed by insiders. LottoBlast lets a sponsor lock prize tokens in an
+  escrow contract, set tiered prizes (e.g. 1st $300, 2nd $200, 3rd $100) plus
+  a fixed entry fee in USDC (e.g. 1 USDC), and have winners drawn provably-fair
+  by Chainlink VRF with prizes auto-distributed on-chain.
 
-thesis: "TODO: If [action], then [outcome], as measured by [metric]"
-target_user: "TODO: Be specific (e.g., freelance designers billing <5 clients/month)"
+  Each participant pays the entry fee on `enter()` — those fees accumulate in
+  the contract and are added to the grand prize at draw time, so the more
+  people enter, the bigger the 1st-place prize. The entry fee also serves as a
+  cheap Sybil filter (per the original brief: "Free-entry giveaways will be
+  farmed by bots with thousands of wallets — add cost").
+
+thesis: "If sponsors can run a verifiably-fair, auto-paying crypto giveaway with paid entries (1 USDC per entry) in under 10 minutes, then >25 sponsors will fund a campaign and >500 unique wallets will pay to enter at least one giveaway within 30 days, as measured by on-chain Entered events"
+target_user: |
+  Primary: Crypto-native participants (DeFi users, NFT holders, token communities)
+  with a self-custody wallet (MetaMask, Rainbow, Coinbase Wallet) on Base or
+  Polygon, who already enter Twitter/Discord giveaways and want fairer ones.
+
+  Secondary: Crypto project marketing leads / community managers (Solana, EVM
+  L2s, memecoins) who run growth giveaways and want a tool that handles
+  escrow, randomness, and payout without manual ops.
 
 distribution: |
-  TODO: How will you get this in front of target users?
-  e.g., Post in r/freelance, Indie Hackers, LinkedIn outreach
+  - Crypto Twitter (CT) — partner with one mid-tier token project for a
+    "first LottoBlast giveaway" launch with cross-promotion.
+  - Farcaster — frame-based entry CTA in the launch post.
+  - Discord communities of Base/Polygon projects (announce in 5-10 server
+    #partnerships channels with sponsor approval).
+  - Reddit r/CryptoCurrency, r/CryptoMoonShots (giveaway flair), r/ethdev.
+  - Direct outreach to 30 token marketing leads via Telegram with a 1-pager
+    on the cost vs. running it manually.
 
-# hypotheses:
-#   - id: h-01
-#     category: demand          # demand | reach | feasibility | monetize | retain
-#     statement: "TODO: Testable prediction with specific numbers"
-#     success_metric: "TODO: What to measure"
-#     threshold: "TODO: Pass/fail number (e.g., > 5% CTR)"
-#     priority_score: 90        # 0-100, higher = test first
-#     experiment_level: 1       # Minimum level needed to test this
-#     depends_on: []
-#     status: pending           # pending | resolved
+hypotheses:
+  - id: h-01
+    category: demand
+    statement: ">8% of visitors to the landing page click 'Connect Wallet' to start engaging"
+    metric:
+      formula: "wallet_connect_clicked / visit_landing"
+      threshold: 0.08
+      operator: gte
+    priority_score: 95
+    experiment_level: 1
+    depends_on: []
+    status: pending
+
+  - id: h-02
+    category: activate
+    statement: ">20% of wallets that connect pay the 1 USDC entry fee and submit at least one giveaway entry transaction"
+    metric:
+      formula: "entry_submitted / wallet_connected"
+      threshold: 0.20
+      operator: gte
+    priority_score: 90
+    experiment_level: 2
+    depends_on: [h-01]
+    status: pending
+
+  - id: h-03
+    category: activate
+    statement: ">10 sponsors will create and fund a campaign in the first 30 days"
+    metric:
+      formula: "campaign_funded / one"
+      threshold: 10
+      operator: gte
+    priority_score: 85
+    experiment_level: 3
+    depends_on: []
+    status: pending
+
+  - id: h-04
+    category: retain
+    statement: ">35% of wallets that submit an entry return to enter a second giveaway within 14 days"
+    metric:
+      formula: "entry_repeat / entry_submitted"
+      threshold: 0.35
+      operator: gte
+    priority_score: 70
+    experiment_level: 3
+    depends_on: [h-02]
+    status: pending
+
+  - id: h-05
+    category: reach
+    statement: "Verifiable on-chain fairness (Chainlink VRF) is the dominant differentiator vs. Twitter/Discord giveaways for crypto-native users"
+    evidence:
+      source: "Polymarket usage of UMA Optimistic Oracle; Chainlink VRF adoption across 1500+ projects; Polygon and Base giveaway tooling landscape scan 2026-Q2"
+      verdict: "Crypto-native users explicitly cite distrust of Twitter giveaways (winner selection, sock puppets, undelivered prizes). VRF + on-chain escrow addresses both head-on."
+      citation: "https://chain.link/random-numbers; competitor scan in docs/competitor-scan.md"
+    priority_score: 60
+    experiment_level: 1
+    depends_on: []
+    status: resolved
 
 # --- 3. Behaviors ---
-# Given/when/then specifications derived from hypotheses.
-# Each behavior IS a feature requirement — they replace the features list.
-# behaviors:
-#   - id: b-01
-#     hypothesis_id: h-01
-#     given: "TODO: Initial condition"
-#     when: "TODO: User action or trigger"
-#     then: "TODO: Observable, measurable outcome"
-#     tests:
-#       - "TODO: Verification assertion"
-#     level: 1
-#   # System behavior example:
-#   - id: b-05
-#     actor: system             # system | cron (default: user)
-#     trigger: "TODO: What starts this (e.g., stripe webhook checkout.session.completed)"
-#     hypothesis_id: h-03
-#     given: "TODO: Initial condition"
-#     when: "TODO: System event"
-#     then: "TODO: Observable outcome"
-#     tests:
-#       - "TODO: Verification assertion"
-#     level: 3
+behaviors:
+  - id: b-01
+    hypothesis_id: h-01
+    pages: [landing]
+    given: "A visitor arrives at the LottoBlast landing page"
+    when: "They read the value prop (verifiable, auto-pay, low gas) and see active giveaways"
+    then: "They click 'Connect Wallet' or 'Browse Giveaways' (>8% of visitors)"
+    tests:
+      - "Landing renders without errors and shows at least 3 active campaigns"
+      - "'Connect Wallet' CTA is visible above the fold"
+    level: 1
+    anonymous_allowed: true
+
+  - id: b-02
+    hypothesis_id: h-01
+    pages: [giveaways]
+    given: "An anonymous visitor wants to browse without committing"
+    when: "They navigate to /giveaways"
+    then: "They see a list of active campaigns with prize pool, entry fee, # of entries, time remaining, and entry rules"
+    tests:
+      - "Giveaway list page renders campaigns from on-chain events indexed into Postgres"
+      - "Each card shows prize_token + total prize_pool + entry_fee_usdc + end_at countdown"
+    level: 1
+    anonymous_allowed: true
+
+  - id: b-03
+    hypothesis_id: h-02
+    pages: [giveaways, giveaway-detail]
+    given: "A user is browsing the giveaway list"
+    when: "They click on a specific campaign"
+    then: "They land on the detail page with full rules, tiered prize breakdown, the 1 USDC entry fee, the current bonus pool from accumulated entries, and an 'Enter (Pay 1 USDC)' button"
+    tests:
+      - "Giveaway detail page renders rules, tiers, entry_fee, bonus_pool, end_at, and resolution method"
+      - "Entry button shows the exact entry_fee amount in its label (e.g. 'Enter (Pay 1 USDC)')"
+      - "Entry button state reflects: not-connected, connected-insufficient-balance, eligible-can-enter, already-entered, closed"
+    level: 1
+    anonymous_allowed: true
+
+  - id: b-04
+    hypothesis_id: h-02
+    pages: [giveaway-detail]
+    given: "An eligible connected wallet with at least 1 USDC balance is on a giveaway detail page"
+    when: "They click 'Enter (Pay 1 USDC)' — the UI sequences two signatures: (1) USDC.approve(giveaway, entry_fee) if allowance is insufficient, then (2) Giveaway.enter()"
+    then: "USDC is transferred into the Giveaway contract via safeTransferFrom on enter(), the Entered(entrant, fee_paid) event is emitted, and the UI flips to 'You're entered — bonus pool is now $N'"
+    tests:
+      - "If USDC allowance < entry_fee, UI prompts approve first then enter; if allowance is sufficient, only enter is signed"
+      - "Giveaway.enter() succeeds and transfers exactly entry_fee USDC into the contract; indexer captures Entered with fee_paid within 30s"
+      - "Calling enter() with insufficient USDC balance reverts with a clear error"
+      - "A wallet that already entered cannot enter again (contract reverts with AlreadyEntered)"
+      - "Subsequent page loads show 'entered' state and the updated bonus pool"
+    level: 2
+
+  - id: b-05
+    hypothesis_id: h-03
+    pages: [create-campaign]
+    given: "A sponsor wants to run a giveaway"
+    when: "They fill in the campaign form (prize_token, tiers, entry_fee, entry_rules, duration) and click 'Create + Fund'"
+    then: "Two txs are signed: token approve + GiveawayFactory.create(). Campaign appears in the public list once funded."
+    tests:
+      - "Create form validates prize_token is an ERC-20, tiers sum <= prize_pool, entry_fee >= 0, end_at is in the future"
+      - "Sponsor can set entry_fee = 0 (free entry) or any positive amount; default is 1 USDC"
+      - "GiveawayCreated event includes the entry_fee value and is captured into the campaigns table"
+      - "Newly funded campaign is visible at /giveaways within 60s with its entry fee shown"
+    level: 3
+
+  - id: b-06
+    hypothesis_id: h-02
+    pages: [profile]
+    given: "A connected user wants to see their entries and any winnings"
+    when: "They navigate to /profile"
+    then: "They see all giveaways they've entered, status of each (open/won/lost/claimed), and a Claim button for unclaimed wins"
+    tests:
+      - "Profile page lists all entries for connected wallet from indexer"
+      - "Won + unclaimed entries surface a Claim CTA that triggers Giveaway.claim()"
+    level: 3
+
+  - id: b-07
+    actor: system
+    trigger: "Giveaway.end_at reached + on-chain trigger by anyone (or keeper)"
+    hypothesis_id: h-03
+    given: "A funded giveaway has reached its end_at and has at least one entry"
+    when: "Anyone calls Giveaway.requestDraw() which triggers Chainlink VRF"
+    then: "VRF callback selects winners by tier, adds the accumulated entry-fee bonus pool to 1st place's prize, marks Winner records on-chain, and pushes prize tokens to winner addresses (push payout, with claim fallback on revert)"
+    tests:
+      - "VRFCoordinator.fulfillRandomWords() correctly seeds the draw"
+      - "Winner-by-tier assignment is deterministic given the VRF seed and entry list"
+      - "1st-place winner receives base_tier_1_amount + (numEntrants * entry_fee) — the full bonus pool"
+      - "Prize transfers succeed for each winning address; failed transfers fall back to claim mode (unclaimedPrize[winner] += amount)"
+      - "WinnersDrawn + PrizePaid events captured into winners table with the inflated 1st-place amount"
+    level: 3
+
+  - id: b-08
+    actor: system
+    trigger: "On-chain WinnersDrawn event"
+    hypothesis_id: h-04
+    given: "A giveaway just resolved with at least one winner"
+    when: "Indexer ingests the WinnersDrawn event"
+    then: "An in-app notification is shown to each winner on next visit; if email is on file, a notification email is sent"
+    tests:
+      - "Winners see a banner on /profile linking to claim or tx hash"
+      - "Email is queued for winners with email_opt_in = true"
+    level: 3
+
+  - id: b-09
+    hypothesis_id: h-04
+    pages: [profile, giveaways]
+    given: "A wallet that previously entered a giveaway has won (or lost) and the campaign has resolved"
+    when: "They return to LottoBlast within 14 days and visit /profile or /giveaways"
+    then: "They see resolved status + any unclaimed prizes prominently, with a one-click Claim or a 'Browse new giveaways' nudge"
+    tests:
+      - "Returning users see a 'Welcome back' banner with their result summary"
+      - "Active giveaways are surfaced first on the list page"
+    level: 3
 
 # --- 4. Journey ---
-# The user journey from landing to value delivery.
-# Drives ux-journeyer, funnel tests, and plan reviews.
 golden_path:
-  - step: "TODO: What happens first (e.g., Visit landing page)"
+  - step: "Visit landing page"
     event: visit_landing
     page: landing
-  - step: "TODO: What action delivers value?"
-    event: activate
-    page: TODO
-target_clicks: 3
+  - step: "Click 'Browse Giveaways' or 'Connect Wallet'"
+    event: cta_click
+    page: landing
+  - step: "Browse list of active giveaways"
+    event: giveaway_list_view
+    page: giveaways
+  - step: "Open a specific giveaway"
+    event: giveaway_detail_view
+    page: giveaway-detail
+  - step: "Connect wallet to enter"
+    event: wallet_connected
+    page: giveaway-detail
+  - step: "Sign entry tx"
+    event: entry_submitted
+    page: giveaway-detail
+target_clicks: 5
 
-# --- 5. Variants (optional) ---
-# Test different messaging for the same product. Each variant gets its own
-# landing page URL (/v/<slug>) and its own ad group in the distribution channel.
-# Omit this section for a single-variant experiment (the default).
-# variants:
-#   - slug: TODO
-#     headline: "TODO: Value proposition variant A"
-#     subheadline: "TODO: How it works, variant A"
-#     cta: "TODO: Action verb + outcome"
-#     promise: "TODO: Core benefit in one phrase"         # generated by /spec
-#     proof: "TODO: Evidence or credibility signal"       # generated by /spec
-#     urgency: "TODO: Why act now"                        # generated by /spec
-#     pain_points:
-#       - "TODO: Pain point 1"
-#       - "TODO: Pain point 2"
-#       - "TODO: Pain point 3"
-#   - slug: TODO
-#     headline: "TODO: Value proposition variant B"
-#     subheadline: "TODO: How it works, variant B"
-#     cta: "TODO: Action verb + outcome"
-#     promise: "TODO: Core benefit in one phrase"         # generated by /spec
-#     proof: "TODO: Evidence or credibility signal"       # generated by /spec
-#     urgency: "TODO: Why act now"                        # generated by /spec
-#     pain_points:
-#       - "TODO: Pain point 1"
-#       - "TODO: Pain point 2"
-#       - "TODO: Pain point 3"
+# --- 5. Variants ---
+variants:
+  - slug: trust
+    headline: "Crypto Giveaways That Can't Be Rigged"
+    subheadline: "On-chain escrow, Chainlink VRF, automatic payouts. No more 'DM the winner.'"
+    cta: "Browse Live Giveaways"
+    promise: "Provably fair winners, prizes paid on-chain in seconds"
+    proof: "Powered by the same Chainlink VRF used by 1,500+ projects including Aavegotchi and PoolTogether"
+    urgency: "Active campaigns ending in hours — enter before the draw"
+    pain_points:
+      - "Twitter giveaway winners always seem to be the host's friends"
+      - "Half the prizes you 'win' on Discord never arrive"
+      - "Manual draws can't be audited — VRF can"
+
+  - slug: speed
+    headline: "Run a Giveaway in 10 Minutes. Pay Winners Automatically."
+    subheadline: "Lock prize tokens, set tiers, share the link. The contract handles the rest."
+    cta: "Create Your First Giveaway"
+    promise: "Sponsor a campaign without spreadsheets, DMs, or manual transfers"
+    proof: "Built on Base — gas costs under $0.10 per draw"
+    urgency: "Stop spending Friday afternoons hand-picking winners"
+    pain_points:
+      - "Manually picking winners eats community-manager time"
+      - "Sending tokens to 10 winners = 10 chances to fat-finger an address"
+      - "No audit trail when sponsors ask 'who won and why'"
 
 # --- 6. Funnel ---
-# funnel:
-#   reach:
-#     metric: "TODO: Top-of-funnel metric (e.g., Ad CTR)"
-#     threshold: "TODO: Pass/fail (e.g., > 2%)"
-#     available_from: L1
-#   demand:
-#     metric: "TODO: Signup/interest metric"
-#     threshold: "TODO: Pass/fail (e.g., > 5%)"
-#     available_from: L1
-#   monetize:
-#     metric: "TODO: Revenue/pricing metric"
-#     threshold: "TODO: Pass/fail (e.g., > 7%)"
-#     available_from: L2
-#   retain:
-#     metric: "TODO: Retention metric"
-#     threshold: "TODO: Pass/fail (e.g., > 30%)"
-#     available_from: L3
-# decision_framework:
-#   scale: "TODO: When to scale (e.g., All tested dimensions >= threshold)"
-#   refine: "TODO: When to refine (e.g., Bottleneck ratio >= 0.7)"
-#   pivot: "TODO: When to pivot (e.g., Bottleneck ratio < 0.7)"
-#   kill: "TODO: When to kill (e.g., Top-funnel < 0.5)"
+funnel:
+  available_from:
+    reach: L1
+    demand: L1
+    activate: L2
+    monetize: L2
+    retain: L3
+  decision_framework:
+    scale: "All tested dimensions >= 1.0"
+    kill: "Any top-funnel (REACH or DEMAND) < 0.5"
+    pivot: "2+ dimensions < 0.8"
+    refine: "1+ dimensions < 1.0 but fewer than 2 below 0.8"
 
 # --- 7. Stack + Deploy ---
-# Per-service values (runtime, hosting, ui, testing) live under services[].
-# Shared values (database, auth, analytics, payment) live directly under stack.
-# Each value maps to a stack file at .claude/stacks/<category>/<value>.md
 stack:
   services:
     - name: app
-      runtime: nextjs          # Web framework — leave default
-      hosting: vercel           # Where the app is deployed — leave default
-      ui: shadcn               # UI component library — leave default
-      testing: playwright      # Page-load smoke tests — created by bootstrap
-  database: supabase           # Database and backend — leave default
-  auth: supabase               # Login/signup system — leave default
-  # auth_providers:            # OAuth providers (e.g., [google, github]). Omit for email-only auth.
-  #   - google
-  #   - github
-  analytics: posthog           # Usage tracking — leave default
-  # payment: stripe            # Uncomment if your experiment involves payments
-  # email: resend              # Uncomment for welcome email + activation nudge
+      runtime: nextjs
+      hosting: vercel
+      ui: shadcn
+      testing: playwright
+  database: supabase           # Stores indexed on-chain events, user profiles, off-chain entry verification
+  auth: none                   # Wallet IS the auth (SIWE / RainbowKit + wagmi). No supabase auth.
+  analytics: posthog
+  # payment: none              # All value movement is on-chain (USDC + native tokens). No Stripe.
+
+# --- Custom: Web3 stack hint ---
+# bootstrap will look for .claude/stacks/web3/evm.md (to be authored). It should
+# describe wagmi + viem + RainbowKit + Foundry + Chainlink VRF + a chosen indexer
+# (Ponder.sh recommended for MVP — single Postgres, no separate Graph node).
+web3:
+  chain: base                  # Base mainnet for production; base-sepolia for dev/testnet
+  wallet_kit: rainbowkit
+  client_lib: wagmi+viem
+  contracts:
+    framework: foundry
+    standards: openzeppelin
+    deployed:
+      - GiveawayFactory
+      - Giveaway
+      - VRFConsumer
+  oracle:
+    randomness: chainlink-vrf-v2
+    data_feeds: none           # Phase 1 has no price feeds; Phase 2 (prediction markets) will add them
+  indexer: ponder              # Indexes on-chain events into supabase Postgres
+  default_currency: USDC
+
+# --- Target Geography ---
+# Geofence US (CFTC risk on prediction markets — even giveaways edge into
+# sweepstakes regulation). Start with non-US English-speaking + crypto-heavy
+# regions; expand after legal review.
+target_geo: [GB, CA, AU, NZ, SG, HK, AE]
 
 deploy:
   url: null
   repo: null
-  domain: null               # Parent domain for hosting + email. Default: draftlabs.org
+  domain: null
