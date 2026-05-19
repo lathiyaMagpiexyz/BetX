@@ -25,6 +25,9 @@ const FALLBACK_PRICES: Record<string, number> = {
   BAKE: 0.22,
   FLOKI: 0.00012,
   XVS: 5,
+  TWT: 1.0,
+  THE: 0.25,
+  BSW: 0.05,
 };
 
 const BINANCE_SYMBOLS: Array<{ pair: string; token: keyof typeof FALLBACK_PRICES }> = [
@@ -36,6 +39,9 @@ const BINANCE_SYMBOLS: Array<{ pair: string; token: keyof typeof FALLBACK_PRICES
   { pair: "BAKEUSDT", token: "BAKE" },
   { pair: "FLOKIUSDT", token: "FLOKI" },
   { pair: "XVSUSDT", token: "XVS" },
+  { pair: "TWTUSDT", token: "TWT" },
+  // THE (Thena) is BSC-DEX-only — no Binance pair; FALLBACK_PRICES applies
+  { pair: "BSWUSDT", token: "BSW" },
 ];
 
 export async function fetchTokenPrices(): Promise<Record<string, number>> {

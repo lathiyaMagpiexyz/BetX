@@ -113,6 +113,27 @@ const TOKENS_BY_CHAIN: Record<number, TokenInfo[]> = {
       name: "Venus — lending & borrowing protocol",
       usdPrice: 5.0,
     },
+    {
+      address: "0x4B0F1812e5Df2A09796481Ff14017e6005508003",
+      symbol: "TWT",
+      decimals: 18,
+      name: "Trust Wallet Token — native to Trust Wallet (millions of users)",
+      usdPrice: 1.0,
+    },
+    {
+      address: "0xF4C8E32EaDEC4BFe97E0F595AdD0f4450a863a11",
+      symbol: "THE",
+      decimals: 18,
+      name: "Thena — ve(3,3) DEX & liquidity hub on BSC",
+      usdPrice: 0.25,
+    },
+    {
+      address: "0x965F527D9159dCe6288a2219DB51fc6Eef120dD1",
+      symbol: "BSW",
+      decimals: 18,
+      name: "Biswap — 3-token DEX with active community",
+      usdPrice: 0.05,
+    },
     // --- Blue-chip baselines (keep for variety / entry token fallback) ---
     {
       address: "0x55d398326f99059fF775485246999027B3197955",
