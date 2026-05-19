@@ -7,16 +7,16 @@ import { NavBar } from "@/components/nav-bar";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "LottoBlast — On-Chain Crypto Lotteries",
+  title: "LottoBlast — Discover New BSC Projects. Win Their Tokens.",
   description:
-    "Buy a ticket. Win the jackpot. Lotteries that pay out on-chain in seconds — no Twitter giveaways, no 'DM the winner.'",
+    "Emerging BSC projects launch on-chain giveaways. Pay a small USDT entry fee, get a shot at their tokens. Winners paid on-chain — no Twitter giveaways, no 'DM the winner.'",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
   ),
   openGraph: {
-    title: "LottoBlast — On-Chain Crypto Lotteries",
+    title: "LottoBlast — Discover New BSC Projects. Win Their Tokens.",
     description:
-      "Buy a ticket. Win the jackpot. On-chain payout in seconds.",
+      "Emerging BSC projects giveaway tokens on-chain. Pay USDT to enter, win their tokens, paid instantly on close.",
     type: "website",
   },
 };

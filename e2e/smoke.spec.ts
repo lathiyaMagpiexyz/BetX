@@ -6,22 +6,22 @@ test.describe('Smoke Tests', () => {
     await expect(page).toHaveTitle(/LottoBlast/);
   });
 
-  test('lotteries page loads', async ({ page }) => {
-    await page.goto('/lotteries');
-    await expect(page).toHaveTitle(/Live draws/);
+  test('giveaways page loads', async ({ page }) => {
+    await page.goto('/giveaways');
+    await expect(page).toHaveTitle(/Live giveaways/);
   });
 
-  test('create-draw page loads', async ({ page }) => {
-    await page.goto('/create-draw');
+  test('create-giveaway page loads', async ({ page }) => {
+    await page.goto('/create-giveaway');
     await expect(
-      page.getByRole('heading', { name: /Run your own lottery|Set the jackpot/i })
+      page.getByRole('heading', { name: /Run your own giveaway|Set the prize pool/i })
     ).toBeVisible();
   });
 
-  test('my-tickets page loads', async ({ page }) => {
-    await page.goto('/my-tickets');
+  test('my-entries page loads', async ({ page }) => {
+    await page.goto('/my-entries');
     await expect(
-      page.getByRole('heading', { name: /My tickets/i })
+      page.getByRole('heading', { name: /My entries/i })
     ).toBeVisible();
   });
 
@@ -32,6 +32,6 @@ test.describe('Smoke Tests', () => {
 
   test('speed variant loads', async ({ page }) => {
     await page.goto('/v/speed');
-    await expect(page).toHaveTitle(/Run a Lottery in 60 Seconds/);
+    await expect(page).toHaveTitle(/Run a Giveaway in 60 Seconds/);
   });
 });

@@ -3,9 +3,9 @@ import { fetchActiveGiveaways } from "@/lib/supabase";
 import { fetchTokenPrices } from "@/lib/prices";
 
 export const metadata = {
-  title: "LottoBlast — The Lottery That Pays Out On-Chain",
+  title: "LottoBlast — Discover New BSC Projects. Win Their Tokens.",
   description:
-    "Buy a ticket, watch the jackpot grow, get paid on-chain when the draw closes. No middleman, no DM-the-winner runaround.",
+    "Emerging BSC projects launch on-chain giveaways. Pay USDT to enter, win their tokens when entries close. No middleman, no DM-the-winner runaround.",
 };
 
 export const dynamic = "force-dynamic";

@@ -47,7 +47,7 @@ export interface IndexedGiveaway {
   prize_token_decimals?: number;
   prize_token_usd_price?: number;
 
-  // Populated only for Resolved lotteries — list of winning wallet addresses
+  // Populated only for Resolved giveaways — list of winning wallet addresses
   // in rank order ([0] = 1st place, [1] = 2nd, ...).
   winners?: string[];
 }
@@ -157,7 +157,7 @@ export async function fetchActiveGiveaways(): Promise<IndexedGiveaway[]> {
 }
 
 /**
- * Settled (Resolved-status) lotteries — for the "Recently settled" section.
+ * Settled (Resolved-status) giveaways — for the "Recently settled" section.
  * Returns most-recent first. Each result carries the populated `winners` array.
  */
 export async function fetchSettledGiveaways(

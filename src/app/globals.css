@@ -113,7 +113,7 @@
       0 0 48px hsl(var(--jackpot-gold) / 0.18);
   }
 
-  /* A real-lottery-ticket card. Perforated edges on left and right via cutouts
+  /* A real-giveaway-ticket card. Perforated edges on left and right via cutouts
      punched out with the page background colour. */
   .ticket-card {
     position: relative;
@@ -173,7 +173,7 @@
     animation: marquee 40s linear infinite;
   }
 
-  /* Floating lottery balls drifting in the hero background. */
+  /* Floating giveaway balls drifting in the hero background. */
   @keyframes float-slow {
     0%, 100% { transform: translate(0, 0) rotate(0deg); }
     33% { transform: translate(8px, -12px) rotate(8deg); }

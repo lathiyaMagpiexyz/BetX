@@ -2,7 +2,7 @@
  * Curated list of prize-token options per chain.
  *
  * The Giveaway contract accepts ANY ERC-20 as a prize token — the entry token
- * is fixed at factory deployment, but each lottery picks its own prize token.
+ * is fixed at factory deployment, but each giveaway picks its own prize token.
  * This file is just a UX helper: a dropdown of common tokens so the sponsor
  * doesn't have to paste a 42-char address every time.
  *
@@ -64,37 +64,62 @@ const TOKENS_BY_CHAIN: Record<number, TokenInfo[]> = {
     },
   ],
 
-  // BSC Mainnet (chain 56) — canonical addresses from BscScan, manually
-  // verified. Keep this short and curated; sponsors will paste custom
-  // addresses for anything exotic.
+  // BSC Mainnet (chain 56) — featured project tokens that sponsors can pick
+  // as the prize for their giveaway. Curated emerging-but-credible BSC
+  // projects so the platform feels like a "discover new BSC tokens" surface,
+  // not a generic stablecoin distributor. Sponsors with a custom token paste
+  // its address via the "Custom token" option in the picker.
   [bsc.id]: [
+    // --- Project tokens (featured prize pool tokens) ---
+    {
+      address: "0xa260E12d2B924cb899AE80BB58123ac3fEE1E2F0",
+      symbol: "HOOK",
+      decimals: 18,
+      name: "Hooked Protocol — Web3 onboarding & gamified learning",
+      usdPrice: 0.12,
+    },
+    {
+      address: "0xFceB31A79F71AC9CBDCF853519c1b12D379EdC46",
+      symbol: "LISTA",
+      decimals: 18,
+      name: "Lista DAO — liquid staking & lending on BSC",
+      usdPrice: 0.3,
+    },
+    {
+      address: "0x4691937a7508860F876c9c0a2a617E7d9E945D4B",
+      symbol: "WOO",
+      decimals: 18,
+      name: "WOO Network — DeFi/CeFi infrastructure",
+      usdPrice: 0.18,
+    },
+    {
+      address: "0xE02dF9e3e622DeBdD69fB838bB799E3F168902c5",
+      symbol: "BAKE",
+      decimals: 18,
+      name: "BakerySwap — DEX & launchpad",
+      usdPrice: 0.22,
+    },
+    {
+      address: "0xfb5B838b6cfEEdC2873aB27866079AC55363D37E",
+      symbol: "FLOKI",
+      decimals: 9,
+      name: "Floki — community-driven meme + utility",
+      usdPrice: 0.00012,
+    },
+    {
+      address: "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63",
+      symbol: "XVS",
+      decimals: 18,
+      name: "Venus — lending & borrowing protocol",
+      usdPrice: 5.0,
+    },
+    // --- Blue-chip baselines (keep for variety / entry token fallback) ---
     {
       address: "0x55d398326f99059fF775485246999027B3197955",
       symbol: "USDT",
       decimals: 18,
-      name: "Tether USD",
+      name: "Tether USD (entry-token compatible)",
       usdPrice: 1.0,
-    },
-    {
-      address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
-      symbol: "USDC",
-      decimals: 18,
-      name: "USD Coin",
-      usdPrice: 1.0,
-    },
-    {
-      address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
-      symbol: "BUSD",
-      decimals: 18,
-      name: "Binance USD",
-      usdPrice: 1.0,
-    },
-    {
-      address: "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
-      symbol: "CAKE",
-      decimals: 18,
-      name: "PancakeSwap Token",
-      usdPrice: 2.5,
     },
     {
       address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
@@ -102,6 +127,13 @@ const TOKENS_BY_CHAIN: Record<number, TokenInfo[]> = {
       decimals: 18,
       name: "Wrapped BNB",
       usdPrice: 600.0,
+    },
+    {
+      address: "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+      symbol: "CAKE",
+      decimals: 18,
+      name: "PancakeSwap Token",
+      usdPrice: 2.5,
     },
   ],
 

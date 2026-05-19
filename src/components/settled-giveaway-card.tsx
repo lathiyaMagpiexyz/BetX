@@ -23,7 +23,7 @@ function settledAgo(endAt: string): string {
   return `${Math.floor(diff / 86_400 / 30)}mo ago`;
 }
 
-export function SettledLotteryCard({ giveaway }: Props) {
+export function SettledGiveawayCard({ giveaway }: Props) {
   const prizePool = BigInt(giveaway.prize_pool);
   const prizeSymbol = giveaway.prize_token_symbol ?? ENTRY_TOKEN_SYMBOL;
   const prizeDecimals = giveaway.prize_token_decimals ?? ENTRY_TOKEN_DECIMALS;
@@ -33,7 +33,7 @@ export function SettledLotteryCard({ giveaway }: Props) {
 
   return (
     <Link
-      href={`/lotteries/${giveaway.address}`}
+      href={`/giveaways/${giveaway.address}`}
       className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       <div className="ticket-card shine-on-hover relative h-full p-5 transition-all group-hover:border-accent/50 group-hover:-translate-y-0.5">

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { isAddress } from "viem";
 import { fetchGiveaway } from "@/lib/supabase";
-import { LotteryDetailClient } from "@/components/lottery-detail-client";
+import { GiveawayDetailClient } from "@/components/giveaway-detail-client";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +18,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function LotteryDetailPage({
+export default async function GiveawayDetailPage({
   params,
 }: {
   params: Promise<{ address: string }>;
@@ -29,5 +29,5 @@ export default async function LotteryDetailPage({
   const giveaway = await fetchGiveaway(address);
   if (!giveaway) notFound();
 
-  return <LotteryDetailClient initial={giveaway} />;
+  return <GiveawayDetailClient initial={giveaway} />;
 }

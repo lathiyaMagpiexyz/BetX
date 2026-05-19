@@ -300,7 +300,9 @@ stack:
       hosting: vercel
       ui: shadcn
       testing: playwright
-  database: supabase           # Stores indexed on-chain events, user profiles, off-chain entry verification
+  # database: supabase         # Disabled for demo deploy — indexer (Ponder) is not deployed,
+                               # frontend falls back to direct on-chain reads via viem.
+                               # Re-enable + run /change to wire Supabase when indexer ships.
   auth: none                   # Wallet IS the auth (SIWE / RainbowKit + wagmi). No supabase auth.
   analytics: posthog
   # payment: none              # All value movement is on-chain (USDC + native tokens). No Stripe.

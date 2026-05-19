@@ -21,7 +21,7 @@ import { ENTRY_TOKEN_SYMBOL } from "@/lib/contracts";
 
 const ENTRY_SYMBOL = displaySymbol(ENTRY_TOKEN_SYMBOL);
 
-export default function MyTicketsPage() {
+export default function MyEntriesPage() {
   const { address, isConnected } = useAccount();
   const [entries, setEntries] = useState<IndexedEntry[]>([]);
   const [wins, setWins] = useState<IndexedWinner[]>([]);
@@ -45,7 +45,7 @@ export default function MyTicketsPage() {
     return (
       <main className="container mx-auto px-4 py-16">
         <h1 className="mb-4 text-center text-4xl font-black tracking-tight">
-          <span className="text-jackpot">My tickets</span>
+          <span className="text-jackpot">My entries</span>
         </h1>
         <div className="mt-8">
           <EmptyWalletState />
@@ -63,10 +63,10 @@ export default function MyTicketsPage() {
           🎟️ Your activity
         </span>
         <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
-          <span className="text-jackpot">My tickets</span>
+          <span className="text-jackpot">My entries</span>
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          {formatAddress(address)} · {entries.length} tickets · {wins.length}{" "}
+          {formatAddress(address)} · {entries.length} entries · {wins.length}{" "}
           wins
         </p>
       </header>
@@ -86,7 +86,7 @@ export default function MyTicketsPage() {
                 <span>
                   Rank #{w.rank} ·{" "}
                   <Link
-                    href={`/lotteries/${w.giveaway}`}
+                    href={`/giveaways/${w.giveaway}`}
                     className="font-mono text-accent underline"
                   >
                     {formatAddress(w.giveaway)}
@@ -100,27 +100,27 @@ export default function MyTicketsPage() {
           </ul>
           <p className="mt-3 text-xs text-muted-foreground">
             Prizes auto-pay when winners are confirmed. The claim button is only
-            needed if the auto-pay reverted — open the draw to claim manually.
+            needed if the auto-pay reverted — open the giveaway to claim manually.
           </p>
         </section>
       )}
 
       <section className="space-y-3">
         <h2 className="text-base font-bold uppercase tracking-wider text-muted-foreground">
-          Tickets you've bought
+          Entries you&apos;ve submitted
         </h2>
         {loading ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : entries.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border/60 p-12 text-center">
             <div className="text-5xl">🎟️</div>
-            <p className="mt-4 font-semibold">No tickets yet.</p>
+            <p className="mt-4 font-semibold">No entries yet.</p>
             <Button
               asChild
               size="sm"
               className="mt-4 bg-jackpot text-white glow-pink"
             >
-              <Link href="/lotteries">Browse live draws</Link>
+              <Link href="/giveaways">Browse live giveaways</Link>
             </Button>
           </div>
         ) : (
@@ -133,14 +133,14 @@ export default function MyTicketsPage() {
                 <div>
                   <p className="font-medium">
                     <Link
-                      href={`/lotteries/${e.giveaway}`}
+                      href={`/giveaways/${e.giveaway}`}
                       className="hover:text-primary"
                     >
                       {formatAddress(e.giveaway)}
                     </Link>
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    🎟 Ticket: {formatEntry(BigInt(e.fee_paid))}{" "}
+                    🎟 Entry fee: {formatEntry(BigInt(e.fee_paid))}{" "}
                     {ENTRY_SYMBOL} · Block {e.block_number}
                   </p>
                 </div>

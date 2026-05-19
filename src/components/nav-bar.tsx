@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import { ConnectWalletButton } from "@/components/connect-wallet-button";
 
 const NAV_LINKS = [
-  { href: "/lotteries", label: "Browse", icon: "🎟" },
-  { href: "/create-draw", label: "Run a lottery", icon: "🎰" },
-  { href: "/my-tickets", label: "My tickets", icon: "🏆" },
+  { href: "/giveaways", label: "Browse", icon: "🎟" },
+  { href: "/create-giveaway", label: "Run a giveaway", icon: "🎰" },
+  { href: "/my-entries", label: "My entries", icon: "🏆" },
 ];
 
 export function NavBar() {

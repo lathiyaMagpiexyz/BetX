@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { LotteryCard } from "@/components/lottery-card";
-import { SettledLotteryCard } from "@/components/settled-lottery-card";
+import { GiveawayCard } from "@/components/giveaway-card";
+import { SettledGiveawayCard } from "@/components/settled-giveaway-card";
 import {
   fetchActiveGiveaways,
   fetchSettledGiveaways,
@@ -8,9 +8,9 @@ import {
 } from "@/lib/supabase";
 
 export const metadata = {
-  title: "Live draws · LottoBlast",
+  title: "Live BSC project giveaways · LottoBlast",
   description:
-    "Browse every live LottoBlast draw. Buy a ticket in one signature and watch the jackpot grow.",
+    "Browse every live LottoBlast giveaway — emerging BSC projects locking up tokens for their community. Pay USDT to enter in one signature.",
 };
 
 export const dynamic = "force-dynamic";
@@ -28,10 +28,10 @@ function dataSourceLabel(): string {
   if (factoryConfigured) {
     return "Reading live from the chain · refreshes on every load";
   }
-  return "Demo data — set NEXT_PUBLIC_GIVEAWAY_FACTORY_ADDRESS to see real draws";
+  return "Demo data — set NEXT_PUBLIC_GIVEAWAY_FACTORY_ADDRESS to see real giveaways";
 }
 
-export default async function LotteriesPage() {
+export default async function GiveawaysPage() {
   const [live, settled] = await Promise.all([
     fetchActiveGiveaways(),
     fetchSettledGiveaways(12),
@@ -44,18 +44,18 @@ export default async function LotteriesPage() {
           🎰 Live now
         </span>
         <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
-          <span className="text-jackpot">Pick a draw. Buy a ticket.</span>
+          <span className="text-jackpot">Discover BSC projects. Win their tokens.</span>
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
           {dataSourceLabel()}
         </p>
       </header>
 
-      {/* Live draws */}
+      {/* Live giveaways */}
       <section className="mt-12">
         {live.length === 0 ? (
           <div className="relative mx-auto max-w-xl">
-            {/* Floating lottery balls — pure decoration, hidden on mobile */}
+            {/* Floating giveaway balls — pure decoration, hidden on mobile */}
             <div
               aria-hidden
               className="float-slow pointer-events-none absolute -left-6 -top-6 hidden h-12 w-12 rounded-full bg-jackpot opacity-50 blur-[2px] sm:block"
@@ -94,16 +94,16 @@ export default async function LotteriesPage() {
                 <span className="text-jackpot">spinning empty</span>
               </h3>
               <p className="mx-auto mt-3 max-w-sm text-sm text-muted-foreground">
-                No live draws right now — but settled rounds below show the
-                payouts are real, instant, and on-chain.
+                No live BSC project giveaways right now — but settled rounds
+                below show the token payouts are real, instant, and on-chain.
               </p>
 
               <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
-                  href="/create-draw"
+                  href="/create-giveaway"
                   className="glow-pink inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition-transform hover:-translate-y-0.5"
                 >
-                  Run a draw
+                  Run a giveaway
                 </Link>
                 {settled.length > 0 ? (
                   <a
@@ -130,7 +130,7 @@ export default async function LotteriesPage() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {live.map((g) => (
-              <LotteryCard key={g.address} giveaway={g} />
+              <GiveawayCard key={g.address} giveaway={g} />
             ))}
           </div>
         )}
@@ -147,14 +147,14 @@ export default async function LotteriesPage() {
               Past <span className="text-jackpot">winners</span>
             </h2>
             <p className="mt-3 text-sm text-muted-foreground">
-              Every payout is permanently recorded on-chain. Click any draw to
+              Every payout is permanently recorded on-chain. Click any giveaway to
               see the full receipt.
             </p>
           </div>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {settled.map((g) => (
-              <SettledLotteryCard key={g.address} giveaway={g} />
+              <SettledGiveawayCard key={g.address} giveaway={g} />
             ))}
           </div>
         </section>

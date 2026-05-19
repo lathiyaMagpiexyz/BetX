@@ -11,16 +11,31 @@
  */
 
 const FALLBACK_PRICES: Record<string, number> = {
+  // Stables (no fetch needed)
   USDT: 1,
   USDC: 1,
   BUSD: 1,
+  // Blue-chip BSC
   WBNB: 600,
   CAKE: 2.5,
+  // Emerging BSC project tokens (featured on the landing as giveaway prizes)
+  HOOK: 0.12,
+  LISTA: 0.3,
+  WOO: 0.18,
+  BAKE: 0.22,
+  FLOKI: 0.00012,
+  XVS: 5,
 };
 
 const BINANCE_SYMBOLS: Array<{ pair: string; token: keyof typeof FALLBACK_PRICES }> = [
   { pair: "BNBUSDT", token: "WBNB" },
   { pair: "CAKEUSDT", token: "CAKE" },
+  { pair: "HOOKUSDT", token: "HOOK" },
+  { pair: "LISTAUSDT", token: "LISTA" },
+  { pair: "WOOUSDT", token: "WOO" },
+  { pair: "BAKEUSDT", token: "BAKE" },
+  { pair: "FLOKIUSDT", token: "FLOKI" },
+  { pair: "XVSUSDT", token: "XVS" },
 ];
 
 export async function fetchTokenPrices(): Promise<Record<string, number>> {

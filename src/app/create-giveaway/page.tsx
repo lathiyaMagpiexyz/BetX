@@ -32,7 +32,7 @@ interface Tier {
 
 const CUSTOM_OPTION = "__custom__";
 
-export default function CreateDrawPage() {
+export default function CreateGiveawayPage() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { writeContractAsync, isPending } = useWriteContract();
@@ -155,7 +155,7 @@ export default function CreateDrawPage() {
     }
     if (!isFactoryOwner) {
       setError(
-        "Only the factory admin can launch a draw. Switch to the wallet that deployed the factory."
+        "Only the factory admin can launch a giveaway. Switch to the wallet that deployed the factory."
       );
       return;
     }
@@ -239,16 +239,16 @@ export default function CreateDrawPage() {
             </span>
           </span>
           <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
-            <span className="text-jackpot">Run your own lottery</span>
+            <span className="text-jackpot">Run your own giveaway</span>
           </h1>
           <p className="mx-auto mt-3 max-w-lg text-sm text-muted-foreground">
-            One signature. Pick the prize token, set tier amounts and a ticket
-            price, share the link. Chainlink VRF picks the winners. Payouts
+            One signature. Pick the prize token, set tier amounts and an entry
+            fee, share the link. The sponsor confirms winners on close. Payouts
             settle on-chain.
           </p>
           <p className="mx-auto mt-3 max-w-lg text-xs text-muted-foreground/80">
-            Launching a draw is gated to the factory admin wallet during the
-            pilot. <Link href="/lotteries" className="text-primary underline underline-offset-2">Browse live draws</Link> as a player, or reach out on{" "}
+            Launching a giveaway is gated to the factory admin wallet during the
+            pilot. <Link href="/giveaways" className="text-primary underline underline-offset-2">Browse live giveaways</Link> as a player, or reach out on{" "}
             <a href="https://t.me/lottoblast" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Telegram</a>{" "}
             if you want sponsor access.
           </p>
@@ -256,8 +256,8 @@ export default function CreateDrawPage() {
 
         <div className="mt-10">
           <EmptyWalletState
-            title="Connect a wallet to sponsor a draw"
-            description={`Players pay you ${entry} per ticket. You decide the prize token and amounts.`}
+            title="Connect a wallet to sponsor a giveaway"
+            description={`Players pay ${entry} per entry. You decide the prize token and amounts.`}
           />
         </div>
 
@@ -272,13 +272,13 @@ export default function CreateDrawPage() {
             },
             {
               icon: "🎲",
-              title: "Provably-fair draw",
-              body: "Chainlink VRF picks winners on close. The seed is on-chain — auditable forever.",
+              title: "Sponsor-confirmed winners",
+              body: "Winners are confirmed on-chain at close. Every entry, every payout — auditable forever.",
             },
             {
               icon: "⚡",
               title: "Auto payout",
-              body: `Every ${entry} of entry fees pumps the 1st-place jackpot, then pays out on draw.`,
+              body: `Every ${entry} of entry fees grows the 1st-place prize pool, paid out the moment winners are confirmed.`,
             },
           ].map((card) => (
             <li
@@ -324,7 +324,7 @@ export default function CreateDrawPage() {
             <span className="text-jackpot">Sponsor access required</span>
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-sm text-muted-foreground">
-            Launching a draw is restricted to the factory admin during the
+            Launching a giveaway is restricted to the factory admin during the
             pilot. The wallet you connected (
             <span className="font-mono">
               {address.slice(0, 6)}…{address.slice(-4)}
@@ -335,8 +335,8 @@ export default function CreateDrawPage() {
 
         <div className="mx-auto mt-10 max-w-md rounded-2xl border border-border/60 bg-card/60 p-6 text-center backdrop-blur">
           <p className="text-sm text-muted-foreground">
-            Want to sponsor your community&apos;s next draw? Drop us a line and
-            we&apos;ll add your wallet to the allowlist.
+            Want to sponsor your community&apos;s next giveaway? Drop us a line
+            and we&apos;ll add your wallet to the allowlist.
           </p>
           <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
@@ -348,10 +348,10 @@ export default function CreateDrawPage() {
               💬 Contact us on Telegram
             </a>
             <Link
-              href="/lotteries"
+              href="/giveaways"
               className="inline-flex items-center justify-center rounded-full border border-border/80 px-6 py-2.5 text-sm font-semibold text-foreground/90 transition-colors hover:border-accent/70 hover:text-accent"
             >
-              🎟 Browse live draws
+              🎟 Browse live giveaways
             </Link>
           </div>
         </div>
@@ -363,14 +363,14 @@ export default function CreateDrawPage() {
     <main className="container mx-auto max-w-2xl px-4 py-12">
       <header className="text-center">
         <span className="text-xs font-medium uppercase tracking-[0.3em] text-accent">
-          🎰 Launch a draw
+          🎰 Launch a giveaway
         </span>
         <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
-          <span className="text-jackpot">Set the jackpot.</span>
+          <span className="text-jackpot">Set the prize pool.</span>
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Three tiers by default — 1st, 2nd, 3rd. Every ticket sold pumps the
-          1st-place jackpot.
+          Three tiers by default — 1st, 2nd, 3rd. Every entry grows the
+          1st-place prize pool.
         </p>
       </header>
 
@@ -453,7 +453,7 @@ export default function CreateDrawPage() {
 
           <p className="text-xs text-muted-foreground">
             Winners receive this token. Sponsor sends this token to the
-            contract whenever they decide (typically after the draw).
+            contract whenever they decide (typically after entries close).
           </p>
         </div>
 
@@ -528,7 +528,7 @@ export default function CreateDrawPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="entry-fee">
-              <span aria-hidden>🎟</span> Ticket price ({entrySymbol})
+              <span aria-hidden>🎟</span> Entry fee ({entrySymbol})
             </Label>
             <Input
               id="entry-fee"
@@ -569,11 +569,11 @@ export default function CreateDrawPage() {
 
         {createdAddress && (
           <div className="rounded-lg bg-emerald-500/10 p-4 text-sm text-emerald-400">
-            <p className="font-semibold">🎉 Draw launched!</p>
+            <p className="font-semibold">🎉 Giveaway launched!</p>
             <p className="mt-1">
               Address:{" "}
               <Link
-                href={`/lotteries/${createdAddress}`}
+                href={`/giveaways/${createdAddress}`}
                 className="font-mono underline"
               >
                 {createdAddress}
@@ -603,7 +603,7 @@ export default function CreateDrawPage() {
           size="lg"
           className="w-full bg-jackpot text-white glow-pink transition-transform hover:scale-[1.01]"
         >
-          {step === "creating" ? "Launching draw…" : "🎰 Launch the draw"}
+          {step === "creating" ? "Launching giveaway…" : "🎰 Launch giveaway"}
         </Button>
 
         {!isFactoryConfigured && (

@@ -21,49 +21,49 @@ function computeUsd(
 
 const COPY = {
   trust: {
-    badge: "On BSC · Verified contracts · Pay USDT to enter",
-    headline: "The Lottery That Pays Out On-Chain",
-    sub: "Buy a ticket for a chance at the fixed prize pool. When the draw ends, winners are paid on-chain in the same transaction. No middleman. No 'DM the winner.'",
-    primary: { label: "🎟️ Browse live draws", href: "/lotteries" },
-    secondary: { label: "Run your own draw", href: "/create-draw" },
+    badge: "Curated BSC projects · Verified contracts · Pay USDT to enter",
+    headline: "Discover New BSC Projects. Win Their Tokens.",
+    sub: "Every giveaway is an emerging BSC project locking up tokens for their community. Pay a small entry fee for a shot at the prize pool. Winners are paid on-chain when entries close. No middleman. No 'DM the winner.'",
+    primary: { label: "🎟️ Browse live giveaways", href: "/giveaways" },
+    secondary: { label: "Run your project's giveaway", href: "/create-giveaway" },
     proof:
-      "Every draw lives at a public address you can audit. Full Solidity source verified on BscScan.",
+      "Every giveaway lives at a public address you can audit. Full Solidity source verified on BscScan.",
     why: [
       {
-        emoji: "💰",
-        title: "Sponsor-set prize pool",
-        body: "The jackpot is locked in at draw creation. You know exactly what you're playing for before you buy.",
+        emoji: "🚀",
+        title: "Curated BSC projects",
+        body: "Each giveaway is sponsored by an emerging BSC project growing their community. New tokens, real liquidity, fresh drops every week.",
       },
       {
         emoji: "⚡",
-        title: "Prizes paid automatically",
-        body: "The moment the sponsor confirms the randomly picked winners, prize tokens land in the wallet. No claim form, no waiting.",
+        title: "Tokens paid automatically",
+        body: "The moment the sponsor confirms the randomly picked winners, project tokens land in your wallet. No claim form, no waiting.",
       },
       {
         emoji: "🔍",
         title: "Every move is on-chain",
-        body: "Tickets bought, winners chosen, prizes paid — all permanently recorded and visible on the explorer.",
+        body: "Entries received, winners chosen, tokens paid — all permanently recorded and visible on BscScan.",
       },
     ],
   },
   speed: {
-    badge: "Launch a lottery in 60 seconds",
-    headline: "Run Your Own Lottery. Skip the Spreadsheet.",
-    sub: "Set the tiers, set the ticket price, share the link. The smart contract handles ticket sales, the draw, and the payouts.",
-    primary: { label: "✨ Create your first draw", href: "/create-draw" },
-    secondary: { label: "See it running", href: "/lotteries" },
+    badge: "Reach 10,000+ BSC wallets in 60 seconds",
+    headline: "Get Your Token in Real Wallets. Skip the Spreadsheet.",
+    sub: "Lock the tokens, set the entry fee, share the link. The smart contract handles entries, winner selection, and payouts. Your community grows while you focus on shipping.",
+    primary: { label: "✨ Launch your project's giveaway", href: "/create-giveaway" },
+    secondary: { label: "See it running", href: "/giveaways" },
     proof:
-      "Built on BSC — under $0.01 in gas per ticket. Your community plays without thinking about fees.",
+      "Built on BSC — under $0.01 in gas per entry. Pay-to-enter filters out bot farms automatically.",
     why: [
       {
-        emoji: "🎰",
-        title: "Sponsor sets the prize tiers",
-        body: "Three winners by default — 1st, 2nd, 3rd. Add more, change the split, set the ticket price.",
+        emoji: "🎯",
+        title: "Crypto-native wallets, not farm bots",
+        body: "The USDT entry fee filters out airdrop farmers. Your tokens land with users who actually use BSC.",
       },
       {
         emoji: "🧾",
-        title: "Each ticket is an on-chain entry",
-        body: "Players hit one button, sign once. The contract records the ticket. Ticket revenue goes to you, the sponsor.",
+        title: "Each entry is recorded on-chain",
+        body: "Players hit one button, sign once. The contract records the entry. Entry-fee revenue goes to you, the project sponsor.",
       },
       {
         emoji: "🏆",
@@ -85,32 +85,32 @@ const FEATURED_WINNERS: {
   addr: string;
   amount: string;
   token: string;
-  lottery: string;
+  giveaway: string;
   ago: string;
 }[] = [
-  { rank: 1, addr: "0x4A1F…7B92", amount: "12,500", token: "USDT", lottery: "Mega Friday",  ago: "2h ago" },
-  { rank: 1, addr: "0xB3E2…4D81", amount: "50",     token: "WBNB", lottery: "BNB Frenzy",   ago: "1d ago" },
-  { rank: 2, addr: "0x9C4F…3A12", amount: "5,000",  token: "CAKE", lottery: "PancakeRain",  ago: "3d ago" },
-  { rank: 1, addr: "0xDA88…5E10", amount: "8,500",  token: "BUSD", lottery: "Stable Bag",   ago: "5d ago" },
-  { rank: 1, addr: "0xFE21…8C40", amount: "25,000", token: "USDT", lottery: "Genesis Draw", ago: "1w ago" },
-  { rank: 3, addr: "0x7755…12CD", amount: "1,500",  token: "CAKE", lottery: "PancakeRain",  ago: "2w ago" },
+  { rank: 1, addr: "0x4A1F…7B92", amount: "120,000",  token: "HOOK",  giveaway: "Hooked Community Drop",  ago: "2h ago" },
+  { rank: 1, addr: "0xB3E2…4D81", amount: "8,500",    token: "LISTA", giveaway: "Lista Mainnet Push",    ago: "1d ago" },
+  { rank: 2, addr: "0x9C4F…3A12", amount: "5,000",    token: "WOO",   giveaway: "WOO Launch Week",       ago: "3d ago" },
+  { rank: 1, addr: "0xDA88…5E10", amount: "12,500",   token: "BAKE",  giveaway: "BakerySwap V3 Boost",   ago: "5d ago" },
+  { rank: 1, addr: "0xFE21…8C40", amount: "5,000,000",token: "FLOKI", giveaway: "Floki Mission",          ago: "1w ago" },
+  { rank: 3, addr: "0x7755…12CD", amount: "300",      token: "XVS",   giveaway: "Venus V4 Drop",          ago: "2w ago" },
 ];
 
 type Activity =
-  | { kind: "ticket"; addr: string; lottery?: string; ago: string }
+  | { kind: "ticket"; addr: string; giveaway?: string; ago: string }
   | { kind: "win"; addr: string; amount: string; token: string; ago: string }
   | { kind: "launch"; addr: string; ago: string }
-  | { kind: "close"; lottery: string; in: string; ago: string };
+  | { kind: "close"; giveaway: string; in: string; ago: string };
 
 const LIVE_ACTIVITY: Activity[] = [
-  { kind: "ticket", addr: "0x4A1F…7B92", lottery: "Mega Friday", ago: "1m ago" },
-  { kind: "win",    addr: "0xB3E2…4D81", amount: "50",    token: "WBNB", ago: "5m ago" },
+  { kind: "ticket", addr: "0x4A1F…7B92", giveaway: "Hooked Community Drop", ago: "1m ago" },
+  { kind: "win",    addr: "0xB3E2…4D81", amount: "8,500",    token: "LISTA", ago: "5m ago" },
   { kind: "launch", addr: "0x39DD…CC10", ago: "12m ago" },
   { kind: "ticket", addr: "0xC4A2…78EF", ago: "18m ago" },
-  { kind: "win",    addr: "0xDA88…5E10", amount: "8,500", token: "BUSD", ago: "31m ago" },
+  { kind: "win",    addr: "0xDA88…5E10", amount: "12,500",   token: "BAKE",  ago: "31m ago" },
   { kind: "ticket", addr: "0x77F1…22BA", ago: "46m ago" },
-  { kind: "close",  lottery: "Genesis Draw", in: "2h", ago: "1h ago" },
-  { kind: "win",    addr: "0x9C4F…3A12", amount: "5,000", token: "CAKE", ago: "3h ago" },
+  { kind: "close",  giveaway: "Lista Mainnet Push", in: "2h", ago: "1h ago" },
+  { kind: "win",    addr: "0x9C4F…3A12", amount: "5,000",    token: "WOO",   ago: "3h ago" },
 ];
 
 const ACTIVITY_DOT: Record<Activity["kind"], string> = {
@@ -131,11 +131,10 @@ function renderActivity(
         <>
           <span aria-hidden>🎟</span>
           <span className="font-mono text-foreground/90">{item.addr}</span>
-          <span>bought a ticket</span>
-          {item.lottery && (
+          <span>entered</span>
+          {item.giveaway && (
             <>
-              <span>in</span>
-              <span className="text-accent">{item.lottery}</span>
+              <span className="text-accent">{item.giveaway}</span>
             </>
           )}
           <span className="text-muted-foreground/60">·</span>
@@ -162,7 +161,7 @@ function renderActivity(
       return (
         <>
           <span aria-hidden>🎰</span>
-          <span>New draw launched by</span>
+          <span>New giveaway launched by</span>
           <span className="font-mono text-foreground/90">{item.addr}</span>
           <span className="text-muted-foreground/60">·</span>
           <span>{item.ago}</span>
@@ -172,7 +171,7 @@ function renderActivity(
       return (
         <>
           <span aria-hidden>🎰</span>
-          <span className="text-accent">{item.lottery}</span>
+          <span className="text-accent">{item.giveaway}</span>
           <span>closes in</span>
           <span className="font-bold text-foreground">{item.in}</span>
           <span className="text-muted-foreground/60">·</span>
@@ -217,11 +216,11 @@ function HeroSection({
 }) {
   return (
     <section className="relative px-4 pt-20 pb-16 sm:pt-28">
-      {/* Decorative floating lottery balls */}
-      <LotteryBall className="float-slow absolute left-[6%] top-24 h-16 w-16 text-jackpot-pink opacity-70" label="7" />
-      <LotteryBall className="float-mid absolute right-[8%] top-40 h-12 w-12 text-jackpot-gold opacity-70" label="42" />
-      <LotteryBall className="float-slow absolute left-[18%] bottom-20 h-10 w-10 text-jackpot-purple opacity-60" label="13" />
-      <LotteryBall className="float-mid absolute right-[14%] bottom-32 h-14 w-14 text-jackpot-pink opacity-60" label="99" />
+      {/* Decorative floating giveaway balls */}
+      <GiveawayBall className="float-slow absolute left-[6%] top-24 h-16 w-16 text-jackpot-pink opacity-70" label="7" />
+      <GiveawayBall className="float-mid absolute right-[8%] top-40 h-12 w-12 text-jackpot-gold opacity-70" label="42" />
+      <GiveawayBall className="float-slow absolute left-[18%] bottom-20 h-10 w-10 text-jackpot-purple opacity-60" label="13" />
+      <GiveawayBall className="float-mid absolute right-[14%] bottom-32 h-14 w-14 text-jackpot-pink opacity-60" label="99" />
 
       <div className="relative mx-auto max-w-4xl text-center">
         <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-primary shadow-lg shadow-primary/10">
@@ -260,7 +259,7 @@ function HeroSection({
 
         {/* Headline stats — playful, large, glowing */}
         <div className="mx-auto mt-16 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
-          <HeroStat label="Paid out" value="$600K" sub="across 108 draws" accent />
+          <HeroStat label="Paid out" value="$600K" sub="across 108 giveaways" accent />
           <HeroStat label="Players" value="4,210" sub="unique wallets" />
           {liveCount === 0 ? (
             <HeroStat
@@ -272,7 +271,7 @@ function HeroSection({
             <HeroStat
               label="Live now"
               value={String(liveCount)}
-              sub={liveCount === 1 ? "draw open" : "draws open"}
+              sub={liveCount === 1 ? "giveaway open" : "giveaways open"}
               jackpot
             />
           )}
@@ -440,7 +439,7 @@ function WinnersSection({ prices }: { prices: Record<string, number> }) {
 
                 <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3 text-xs">
                   <span className="font-mono text-muted-foreground">{w.addr}</span>
-                  <span className="text-muted-foreground/80">{w.lottery}</span>
+                  <span className="text-muted-foreground/80">{w.giveaway}</span>
                 </div>
               </div>
             );
@@ -462,16 +461,16 @@ function HowItWorks() {
       <div className="mx-auto max-w-5xl rounded-2xl border border-border/60 bg-card/50 p-8 backdrop-blur sm:p-12 shine-on-hover">
         <div className="text-center">
           <span className="text-xs font-medium uppercase tracking-[0.3em] text-accent">
-            How a LottoBlast draw works
+            How a LottoBlast giveaway works
           </span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
             Three steps. <span className="text-jackpot">Zero spreadsheets.</span>
           </h2>
         </div>
         <ol className="mt-12 grid gap-8 sm:grid-cols-3">
-          <Step n="1" title="Sponsor launches a draw" body="One signature. Set the tier prizes, ticket price, and end time. Your draw is on-chain instantly." />
-          <Step n="2" title="Players buy tickets" body="One signature per player. One ticket per wallet. Tickets sell while the timer ticks down." />
-          <Step n="3" title="Winners get paid" body="When the timer runs out, the sponsor confirms the randomly picked winners. The contract pays out in the same transaction. Done" />
+          <Step n="1" title="Sponsor launches a giveaway" body="One signature. Set the prize tiers, entry fee, and end time. Your giveaway is on-chain instantly." />
+          <Step n="2" title="Players enter" body="One signature per player. One entry per wallet. Entries pour in while the timer ticks down." />
+          <Step n="3" title="Winners get paid" body="When the timer runs out, the sponsor confirms the randomly picked winners. The contract pays out in the same transaction. Done." />
         </ol>
       </div>
     </section>
@@ -500,8 +499,8 @@ function FinalCta() {
           aria-hidden
           className="absolute inset-0 bg-gradient-to-br from-background/30 via-transparent to-background/40"
         />
-        {/* Decorative lottery ball nestled in the corner */}
-        <LotteryBall
+        {/* Decorative giveaway ball nestled in the corner */}
+        <GiveawayBall
           className="float-slow absolute -right-6 -top-6 h-24 w-24 text-jackpot-gold opacity-40 sm:h-28 sm:w-28"
           label="∞"
         />
@@ -510,20 +509,20 @@ function FinalCta() {
             Ready to play?
           </span>
           <h2 className="mt-3 text-3xl font-black tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] sm:text-5xl">
-            Your jackpot is one signature away.
+            Your shot at the prize is one signature away.
           </h2>
           <p className="mt-3 text-sm text-white/80">
-            Buy your first ticket. Watch the contract pay out. No accounts. No emails.
+            Submit your first entry. Watch the contract pay out. No accounts. No emails.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
-              href="/lotteries"
+              href="/giveaways"
               className="inline-flex items-center gap-2 rounded-xl bg-background px-7 py-3.5 text-base font-semibold text-foreground shadow-lg transition-transform hover:scale-[1.03]"
             >
-              🎟 Browse live draws
+              🎟 Browse live giveaways
             </Link>
             <Link
-              href="/create-draw"
+              href="/create-giveaway"
               className="inline-flex items-center gap-2 rounded-xl border border-white/40 bg-white/10 px-7 py-3.5 text-base font-medium text-white backdrop-blur transition-colors hover:bg-white/20"
             >
               ✨ Launch your own
@@ -537,7 +536,7 @@ function FinalCta() {
 
 // --- Decorative SVG --------------------------------------------------------
 
-function LotteryBall({
+function GiveawayBall({
   className,
   label,
 }: {

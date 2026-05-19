@@ -10,12 +10,12 @@ import {
 import { ENTRY_TOKEN_SYMBOL, ENTRY_TOKEN_DECIMALS } from "@/lib/contracts";
 import type { IndexedGiveaway } from "@/lib/supabase";
 
-interface LotteryCardProps {
+interface GiveawayCardProps {
   giveaway: IndexedGiveaway;
 }
 
-export function LotteryCard({ giveaway }: LotteryCardProps) {
-  // Jackpot is fixed at sponsor-set tier amounts. Ticket fees are NOT added
+export function GiveawayCard({ giveaway }: GiveawayCardProps) {
+  // Prize pool is fixed at sponsor-set tier amounts. Entry fees are NOT added
   // to the pool — they stay in the contract as sponsor revenue.
   const totalPool = BigInt(giveaway.prize_pool);
   const timeLeft = formatTimeRemaining(giveaway.end_at);
@@ -34,7 +34,7 @@ export function LotteryCard({ giveaway }: LotteryCardProps) {
 
   return (
     <Link
-      href={`/lotteries/${giveaway.address}`}
+      href={`/giveaways/${giveaway.address}`}
       className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       <div className="ticket-card relative h-full p-6 transition-all group-hover:border-primary/50 group-hover:-translate-y-1 group-hover:shadow-2xl group-hover:shadow-primary/20">
@@ -62,7 +62,7 @@ export function LotteryCard({ giveaway }: LotteryCardProps) {
         {/* Headline prize pool */}
         <div className="mt-6 text-center">
           <div className="text-xs font-medium uppercase tracking-[0.25em] text-accent">
-            Jackpot pool
+            Prize pool
           </div>
           <div className="mt-2 text-5xl font-black tracking-tight text-jackpot">
             {formatTokenAmount(totalPool, prizeDecimals, 0)}
@@ -80,12 +80,12 @@ export function LotteryCard({ giveaway }: LotteryCardProps) {
         {/* Stats row */}
         <div className="mt-6 grid grid-cols-2 gap-2 border-t border-border/60 pt-4 text-center text-sm">
           <Stat
-            label="Ticket price"
+            label="Entry fee"
             value={`${formatEntry(BigInt(giveaway.entry_fee))}`}
             sub={displaySymbol(ENTRY_TOKEN_SYMBOL)}
           />
           <Stat
-            label="Tickets sold"
+            label="Entries"
             value={String(giveaway.num_entrants)}
           />
         </div>
@@ -97,7 +97,7 @@ export function LotteryCard({ giveaway }: LotteryCardProps) {
 
         {/* CTA hint */}
         <div className="mt-5 text-center text-sm font-semibold text-primary transition-transform group-hover:translate-x-0.5">
-          Buy a ticket →
+          Enter giveaway →
         </div>
       </div>
     </Link>

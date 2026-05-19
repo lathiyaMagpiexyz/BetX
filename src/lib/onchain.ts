@@ -182,7 +182,7 @@ async function readGiveaway(addr: Address): Promise<IndexedGiveaway> {
   // (with USD price). Unknown / custom tokens fall back to on-chain reads.
   const tokenMeta = await resolvePrizeTokenMeta(prizeToken as Address);
 
-  // If the lottery is Resolved (status == 2), fetch its winners array.
+  // If the giveaway is Resolved (status == 2), fetch its winners array.
   // numWinners comes from getState() element [4]. The contract stores winners
   // in a plain array, so we read each index until we hit the count.
   let winners: string[] | undefined = undefined;
@@ -260,8 +260,8 @@ async function resolvePrizeTokenMeta(addr: Address): Promise<PrizeTokenMeta> {
 }
 
 /**
- * Walk every lottery in the factory registry and return the ones this wallet
- * has bought a ticket for. Without an indexer we can't get the original tx
+ * Walk every giveaway in the factory registry and return the ones this wallet
+ * has entered. Without an indexer we can't get the original tx
  * hash / block number, so those fields are empty placeholders.
  */
 export async function fetchOnchainEntriesForWallet(
@@ -318,7 +318,7 @@ export async function fetchOnchainEntriesForWallet(
 }
 
 /**
- * Walk every resolved lottery in the registry, check if this wallet is in
+ * Walk every resolved giveaway in the registry, check if this wallet is in
  * the winners[] array, and surface unclaimed prize amounts.
  */
 export async function fetchOnchainWinsForWallet(
@@ -352,7 +352,7 @@ export async function fetchOnchainWinsForWallet(
       })) as readonly [number, bigint, bigint, bigint, bigint, bigint];
       const status = Number(state[0]);
       const numWinners = Number(state[4]);
-      // Only Resolved lotteries have winners.
+      // Only Resolved giveaways have winners.
       if (status !== 2 || numWinners === 0) continue;
 
       for (let rank = 0; rank < numWinners; rank++) {

@@ -27,7 +27,7 @@ interface Props {
   initial: IndexedGiveaway;
 }
 
-export function LotteryDetailClient({ initial }: Props) {
+export function GiveawayDetailClient({ initial }: Props) {
   const giveaway = initial;
   const address = giveaway.address as Address;
   const { address: userAddress, isConnected } = useAccount();
@@ -39,7 +39,7 @@ export function LotteryDetailClient({ initial }: Props) {
 
   const onChain = useGiveaway(address);
   const liveEntryFee = onChain.entryFee ?? BigInt(giveaway.entry_fee);
-  // Jackpot is fixed at the sponsor-set tier amounts. Ticket fees do NOT
+  // Prize pool is fixed at the sponsor-set tier amounts. Entry fees do NOT
   // add to it — they stay in the contract as sponsor revenue.
   const totalPool = BigInt(giveaway.prize_pool);
   // Prize-token metadata. Falls back to entry token if not enriched.
@@ -132,21 +132,21 @@ export function LotteryDetailClient({ initial }: Props) {
     (() => {
       if (ended)
         return {
-          label: "🔒 Ticket sales closed",
+          label: "🔒 Entries closed",
           disabled: true,
-          helper: "Watch this page — the sponsor will draw winners soon.",
+          helper: "Watch this page — the sponsor will pick winners soon.",
         };
       if (!isConnected)
         return {
-          label: "Connect wallet to buy a ticket",
+          label: "Connect wallet to enter",
           disabled: true,
-          helper: "Your wallet is your ticket holder.",
+          helper: "Your wallet is your entry record.",
         };
       if (onChain.hasEntered)
         return {
-          label: "🎟️ You're in the draw",
+          label: "🎟️ You're in the giveaway",
           disabled: true,
-          helper: "Open /my-tickets after the draw to claim your prize.",
+          helper: "Open /my-entries after the giveaway settles to claim your prize.",
         };
       if (!isFactoryConfigured)
         return {
@@ -160,12 +160,12 @@ export function LotteryDetailClient({ initial }: Props) {
           onChain.enterStep === "approving"
             ? `Approving ${entrySymbol}… (1 of 2)`
             : onChain.enterStep === "entering"
-            ? "Submitting ticket… (2 of 2)"
+            ? "Submitting entry… (2 of 2)"
             : "Confirming…";
         return { label: stepLabel, disabled: true };
       }
       return {
-        label: `🎟 Buy ticket (${formatEntry(liveEntryFee)} ${entrySymbol})`,
+        label: `🎟 Enter (${formatEntry(liveEntryFee)} ${entrySymbol})`,
         disabled: false,
       };
     })();
@@ -177,7 +177,7 @@ export function LotteryDetailClient({ initial }: Props) {
         <span className="rounded-full bg-primary/15 px-2.5 py-1 font-bold text-primary">
           {status === 0 ? (
             <>
-              <span aria-hidden>🎟</span> Live draw
+              <span aria-hidden>🎟</span> Live giveaway
             </>
           ) : (
             statusLabel(status)
@@ -189,7 +189,7 @@ export function LotteryDetailClient({ initial }: Props) {
         </span>
       </div>
 
-      {/* Hero jackpot number — elevated ticket-card with perforated edges */}
+      {/* Hero prize-pool number — elevated ticket-card with perforated edges */}
       <div className="ticket-card relative p-8 text-center sm:p-12">
         {/* Perforated rails on the left and right edges */}
         <div
@@ -201,7 +201,7 @@ export function LotteryDetailClient({ initial }: Props) {
           className="perforation pointer-events-none absolute inset-y-0 right-0 w-2"
         />
         <div className="text-xs font-medium uppercase tracking-[0.3em] text-accent">
-          Total jackpot
+          Total prize pool
         </div>
         {totalPool === 0n ? (
           <div className="prize-pulse mt-3 text-3xl font-bold tracking-tight text-muted-foreground sm:text-4xl">
@@ -222,7 +222,7 @@ export function LotteryDetailClient({ initial }: Props) {
         )}
         <p className="mt-4 text-xs text-muted-foreground">
           Sponsored by {giveaway.sponsor.slice(0, 8)}…{giveaway.sponsor.slice(-6)}{" "}
-          · {numEntrants} tickets sold
+          · {numEntrants} entries
         </p>
       </div>
 
@@ -234,11 +234,11 @@ export function LotteryDetailClient({ initial }: Props) {
           accent
         />
         <Stat
-          label="Ticket price"
+          label="Entry fee"
           value={`${formatEntry(liveEntryFee)} ${entrySymbol}`}
         />
         <Stat
-          label="Tickets sold"
+          label="Entries"
           value={String(numEntrants)}
         />
       </div>
@@ -300,21 +300,21 @@ export function LotteryDetailClient({ initial }: Props) {
         </section>
       ) : null}
 
-      {/* How a LottoBlast lottery works */}
+      {/* How a LottoBlast giveaway works */}
       <section className="mt-10 rounded-2xl border border-border/60 bg-card/50 p-6 backdrop-blur">
         <h2 className="text-base font-bold uppercase tracking-wider text-muted-foreground">
-          How this draw works
+          How this giveaway works
         </h2>
         <ol className="mt-4 space-y-3 text-sm text-muted-foreground">
           <li>
-            <strong className="text-foreground">🎟 Step 1.</strong> Buy a ticket
-            for {formatEntry(liveEntryFee)} {entrySymbol}. First
-            signature approves the spend, second submits the ticket.
+            <strong className="text-foreground">🎟 Step 1.</strong> Pay the
+            entry fee of {formatEntry(liveEntryFee)} {entrySymbol}. First
+            signature approves the spend, second submits your entry.
           </li>
           <li>
-            <strong className="text-foreground">📈 Step 2.</strong> Tickets are
-            on-chain entries. One per wallet. The prize pool is fixed — your
-            ticket fee goes to the sponsor.
+            <strong className="text-foreground">📈 Step 2.</strong> Every entry
+            is recorded on-chain. One per wallet. The prize pool is fixed — your
+            entry fee goes to the sponsor.
           </li>
           <li>
             <strong className="text-foreground">🏆 Step 3.</strong> When the
@@ -324,11 +324,11 @@ export function LotteryDetailClient({ initial }: Props) {
         </ol>
       </section>
 
-      {/* Buy ticket CTA */}
+      {/* Enter CTA */}
       <section className="mt-8 rounded-2xl border border-border/60 bg-card/50 p-6 backdrop-blur sm:flex sm:items-center sm:justify-between sm:gap-6">
         <div className="flex-1">
           <h2 className="text-base font-bold">
-            {ended ? "🔒 Sales closed" : "🎟 Ready to play?"}
+            {ended ? "🔒 Entries closed" : "🎟 Ready to play?"}
           </h2>
           {buttonState.helper && (
             <p className="mt-1 text-sm text-muted-foreground">
@@ -344,7 +344,7 @@ export function LotteryDetailClient({ initial }: Props) {
           </div>
           {txHash && (
             <p className="mt-2 text-sm text-emerald-400">
-              ✅ Ticket confirmed:{" "}
+              ✅ Entry confirmed:{" "}
               <a
                 href={getExplorerTxUrl(txHash)}
                 target="_blank"
@@ -374,7 +374,7 @@ export function LotteryDetailClient({ initial }: Props) {
             </Button>
           )}
           <p className="text-xs text-muted-foreground">
-            One ticket per wallet. Ticket price is sponsor revenue.
+            One entry per wallet. Entry fee is sponsor revenue.
           </p>
         </div>
       </section>
