@@ -58,6 +58,29 @@ export function formatUsd(
   );
 }
 
+const EXPLORER_BY_CHAIN: Record<number, string> = {
+  56: "https://bscscan.com",
+  97: "https://testnet.bscscan.com",
+  8453: "https://basescan.org",
+  84532: "https://sepolia.basescan.org",
+};
+
+export function getExplorerTxUrl(
+  hash: string,
+  chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? "97")
+): string {
+  const base = EXPLORER_BY_CHAIN[chainId] ?? "https://testnet.bscscan.com";
+  return `${base}/tx/${hash}`;
+}
+
+export function getExplorerAddressUrl(
+  addr: string,
+  chainId = Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? "97")
+): string {
+  const base = EXPLORER_BY_CHAIN[chainId] ?? "https://testnet.bscscan.com";
+  return `${base}/address/${addr}`;
+}
+
 export function formatAddress(addr: string | undefined, lead = 6, tail = 4): string {
   if (!addr) return "";
   if (addr.length <= lead + tail) return addr;

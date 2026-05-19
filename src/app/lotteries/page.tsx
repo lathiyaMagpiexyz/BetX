@@ -54,21 +54,78 @@ export default async function LotteriesPage() {
       {/* Live draws */}
       <section className="mt-12">
         {live.length === 0 ? (
-          <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border/60 p-12 text-center">
-            <div className="text-5xl">🎟️</div>
-            <p className="mt-4 text-base font-semibold">
-              No live draws right now.
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Be the first sponsor —{" "}
-              <Link
-                href="/create-draw"
-                className="font-medium text-primary underline"
-              >
-                run a draw
-              </Link>
-              .
-            </p>
+          <div className="relative mx-auto max-w-xl">
+            {/* Floating lottery balls — pure decoration, hidden on mobile */}
+            <div
+              aria-hidden
+              className="float-slow pointer-events-none absolute -left-6 -top-6 hidden h-12 w-12 rounded-full bg-jackpot opacity-50 blur-[2px] sm:block"
+            />
+            <div
+              aria-hidden
+              className="float-mid pointer-events-none absolute -right-4 top-12 hidden h-8 w-8 rounded-full opacity-60 sm:block"
+              style={{
+                background:
+                  "radial-gradient(circle at 30% 30%, hsl(var(--jackpot-gold)) 0%, hsl(var(--jackpot-pink)) 70%)",
+              }}
+            />
+            <div
+              aria-hidden
+              className="float-slow pointer-events-none absolute -bottom-4 left-1/3 hidden h-6 w-6 rounded-full bg-jackpot opacity-40 sm:block"
+              style={{ animationDelay: "-3s" }}
+            />
+
+            <div className="ticket-card relative p-10 text-center sm:p-12">
+              {/* Perforated edges echoing real tickets */}
+              <div
+                aria-hidden
+                className="perforation absolute inset-y-0 left-0 w-2"
+              />
+              <div
+                aria-hidden
+                className="perforation absolute inset-y-0 right-0 w-2"
+              />
+
+              <span className="inline-block rounded-full bg-accent/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-accent">
+                Intermission
+              </span>
+
+              <h3 className="mt-5 text-2xl font-black tracking-tight sm:text-3xl">
+                The drum is{" "}
+                <span className="text-jackpot">spinning empty</span>
+              </h3>
+              <p className="mx-auto mt-3 max-w-sm text-sm text-muted-foreground">
+                No live draws right now — but settled rounds below show the
+                payouts are real, instant, and on-chain.
+              </p>
+
+              <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Link
+                  href="/create-draw"
+                  className="glow-pink inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition-transform hover:-translate-y-0.5"
+                >
+                  Run a draw
+                </Link>
+                {settled.length > 0 ? (
+                  <a
+                    href="#past-winners"
+                    className="inline-flex items-center justify-center rounded-full border border-border/80 px-6 py-2.5 text-sm font-semibold text-foreground/90 transition-colors hover:border-accent/70 hover:text-accent"
+                  >
+                    See past winners ↓
+                  </a>
+                ) : (
+                  <Link
+                    href="/how-it-works"
+                    className="inline-flex items-center justify-center rounded-full border border-border/80 px-6 py-2.5 text-sm font-semibold text-foreground/90 transition-colors hover:border-accent/70 hover:text-accent"
+                  >
+                    How it works
+                  </Link>
+                )}
+              </div>
+
+              <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground/70">
+                Sponsor a round · paid in 60 seconds after settle
+              </p>
+            </div>
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -81,7 +138,7 @@ export default async function LotteriesPage() {
 
       {/* Recently settled */}
       {settled.length > 0 && (
-        <section className="mt-24">
+        <section id="past-winners" className="mt-24 scroll-mt-24">
           <div className="text-center">
             <span className="text-xs font-medium uppercase tracking-[0.3em] text-accent">
               🏆 Recently settled

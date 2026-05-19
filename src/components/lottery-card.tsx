@@ -41,14 +41,20 @@ export function LotteryCard({ giveaway }: LotteryCardProps) {
         {/* Top row: status + timer */}
         <div className="flex items-center justify-between text-xs">
           <span className="rounded-full bg-primary/15 px-3 py-1 font-bold uppercase tracking-wider text-primary">
-            {giveaway.status === "Open" ? "🎟 Live" : giveaway.status}
+            {giveaway.status === "Open" ? (
+              <>
+                <span aria-hidden>🎟</span> Live
+              </>
+            ) : (
+              giveaway.status
+            )}
           </span>
           <span
             className={`font-medium ${
               closingSoon ? "text-destructive" : "text-muted-foreground"
             }`}
           >
-            {closingSoon && "⏰ "}
+            {closingSoon && <span aria-hidden>⏰ </span>}
             {timeLeft}
           </span>
         </div>

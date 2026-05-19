@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useReadContract, useWriteContract, useAccount } from "wagmi";
 import type { Address } from "viem";
 import { CONTRACTS, giveawayInstanceAbi } from "@/lib/contracts";
+
+export type EnterStep = "idle" | "approving" | "entering";
 
 /**
  * Read + write hooks for a single Giveaway contract instance.
@@ -60,6 +63,7 @@ export function useGiveaway(address: Address) {
   });
 
   const { writeContractAsync, isPending: isEntering } = useWriteContract();
+  const [enterStep, setEnterStep] = useState<EnterStep>("idle");
 
   async function enterPaid() {
     if (entryFee === undefined) {
@@ -67,22 +71,28 @@ export function useGiveaway(address: Address) {
     }
     const fee = entryFee as bigint;
 
-    if (((allowance as bigint | undefined) ?? 0n) < fee) {
-      await writeContractAsync({
-        address: CONTRACTS.entryToken.address,
-        abi: CONTRACTS.entryToken.abi,
-        functionName: "approve",
-        args: [address, fee],
+    try {
+      if (((allowance as bigint | undefined) ?? 0n) < fee) {
+        setEnterStep("approving");
+        await writeContractAsync({
+          address: CONTRACTS.entryToken.address,
+          abi: CONTRACTS.entryToken.abi,
+          functionName: "approve",
+          args: [address, fee],
+        });
+        await refetchAllowance();
+      }
+      setEnterStep("entering");
+      const hash = await writeContractAsync({
+        address,
+        abi: giveawayInstanceAbi,
+        functionName: "enter",
+        args: [],
       });
-      await refetchAllowance();
+      return hash;
+    } finally {
+      setEnterStep("idle");
     }
-
-    return writeContractAsync({
-      address,
-      abi: giveawayInstanceAbi,
-      functionName: "enter",
-      args: [],
-    });
   }
 
   async function selectWinners(selectedWinners: Address[]) {
@@ -114,6 +124,7 @@ export function useGiveaway(address: Address) {
     selectWinners,
     claim,
     isEntering,
+    enterStep,
     refetchState,
     refetchAllowance,
   };

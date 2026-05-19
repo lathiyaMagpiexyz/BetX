@@ -11,7 +11,12 @@ import {
   type IndexedEntry,
   type IndexedWinner,
 } from "@/lib/supabase";
-import { displaySymbol, formatAddress, formatEntry } from "@/lib/format";
+import {
+  displaySymbol,
+  formatAddress,
+  formatEntry,
+  getExplorerTxUrl,
+} from "@/lib/format";
 import { ENTRY_TOKEN_SYMBOL } from "@/lib/contracts";
 
 const ENTRY_SYMBOL = displaySymbol(ENTRY_TOKEN_SYMBOL);
@@ -139,9 +144,14 @@ export default function MyTicketsPage() {
                     {ENTRY_SYMBOL} · Block {e.block_number}
                   </p>
                 </div>
-                <span className="text-xs font-mono text-muted-foreground">
+                <a
+                  href={getExplorerTxUrl(e.tx_hash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-mono text-muted-foreground hover:text-primary"
+                >
                   {formatAddress(e.tx_hash)}
-                </span>
+                </a>
               </li>
             ))}
           </ul>

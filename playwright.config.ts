@@ -2,14 +2,22 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true,
+  // Pages with `force-dynamic` server components make parallel requests
+  // saturate the dev server's JIT compilation. Run serially with a single
+  // worker so each page has time to render.
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  retries: 2,
+  workers: 1,
   reporter: 'html',
+  timeout: 60_000,
+  expect: {
+    timeout: 30_000,
+  },
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
+    navigationTimeout: 30_000,
   },
   projects: [
     {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 interface LandingProps {
   variant: "trust" | "speed";
@@ -112,32 +113,79 @@ const LIVE_ACTIVITY: Activity[] = [
   { kind: "win",    addr: "0x9C4F…3A12", amount: "5,000", token: "CAKE", ago: "3h ago" },
 ];
 
-function formatActivity(
+const ACTIVITY_DOT: Record<Activity["kind"], string> = {
+  win: "bg-jackpot-gold shadow-[0_0_8px_hsl(var(--jackpot-gold)/0.7)]",
+  ticket: "bg-primary shadow-[0_0_8px_hsl(var(--primary)/0.6)]",
+  launch:
+    "bg-jackpot-purple shadow-[0_0_8px_hsl(var(--jackpot-purple)/0.7)]",
+  close: "bg-accent shadow-[0_0_8px_hsl(var(--accent)/0.6)]",
+};
+
+function renderActivity(
   item: Activity,
   prices: Record<string, number>
-): string {
+): ReactNode {
   switch (item.kind) {
     case "ticket":
-      return `🎟  ${item.addr} bought a ticket${
-        item.lottery ? ` in ${item.lottery}` : ""
-      }  ·  ${item.ago}`;
+      return (
+        <>
+          <span aria-hidden>🎟</span>
+          <span className="font-mono text-foreground/90">{item.addr}</span>
+          <span>bought a ticket</span>
+          {item.lottery && (
+            <>
+              <span>in</span>
+              <span className="text-accent">{item.lottery}</span>
+            </>
+          )}
+          <span className="text-muted-foreground/60">·</span>
+          <span>{item.ago}</span>
+        </>
+      );
     case "win": {
       const usd = computeUsd(item.amount, item.token, prices);
-      return `🏆  ${item.addr} won ${item.amount} ${item.token}${
-        usd ? ` (~${usd})` : ""
-      }  ·  ${item.ago}`;
+      return (
+        <>
+          <span aria-hidden>🏆</span>
+          <span className="font-mono text-foreground/90">{item.addr}</span>
+          <span>won</span>
+          <span className="font-bold text-jackpot">
+            {item.amount} {item.token}
+          </span>
+          {usd && <span className="text-muted-foreground/70">(~{usd})</span>}
+          <span className="text-muted-foreground/60">·</span>
+          <span>{item.ago}</span>
+        </>
+      );
     }
     case "launch":
-      return `🎰  New draw launched by ${item.addr}  ·  ${item.ago}`;
+      return (
+        <>
+          <span aria-hidden>🎰</span>
+          <span>New draw launched by</span>
+          <span className="font-mono text-foreground/90">{item.addr}</span>
+          <span className="text-muted-foreground/60">·</span>
+          <span>{item.ago}</span>
+        </>
+      );
     case "close":
-      return `🎰  ${item.lottery} closes in ${item.in}  ·  ${item.ago}`;
+      return (
+        <>
+          <span aria-hidden>🎰</span>
+          <span className="text-accent">{item.lottery}</span>
+          <span>closes in</span>
+          <span className="font-bold text-foreground">{item.in}</span>
+          <span className="text-muted-foreground/60">·</span>
+          <span>{item.ago}</span>
+        </>
+      );
   }
 }
 
 const RANK_BADGE = {
-  1: { emoji: "🏆", label: "1st place", color: "from-amber-400 to-amber-600" },
-  2: { emoji: "🥈", label: "2nd place", color: "from-slate-300 to-slate-500" },
-  3: { emoji: "🥉", label: "3rd place", color: "from-orange-500 to-orange-700" },
+  1: { emoji: "🏆", label: "1st place", color: "from-amber-300 to-amber-500" },
+  2: { emoji: "🥈", label: "2nd place", color: "from-slate-200 to-slate-400" },
+  3: { emoji: "🥉", label: "3rd place", color: "from-orange-400 to-orange-600" },
 };
 
 // ---------------------------------------------------------------------------
@@ -214,11 +262,20 @@ function HeroSection({
         <div className="mx-auto mt-16 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
           <HeroStat label="Paid out" value="$600K" sub="across 108 draws" accent />
           <HeroStat label="Players" value="4,210" sub="unique wallets" />
-          <HeroStat
-            label="Live now"
-            value={String(liveCount)}
-            sub={liveCount === 1 ? "draw open" : "draws open"}
-          />
+          {liveCount === 0 ? (
+            <HeroStat
+              label="Up next"
+              value="Soon"
+              sub="be the first in line"
+            />
+          ) : (
+            <HeroStat
+              label="Live now"
+              value={String(liveCount)}
+              sub={liveCount === 1 ? "draw open" : "draws open"}
+              jackpot
+            />
+          )}
         </div>
       </div>
     </section>
@@ -230,12 +287,15 @@ function HeroStat({
   value,
   sub,
   accent,
+  jackpot,
 }: {
   label: string;
   value: string;
   sub: string;
   accent?: boolean;
+  jackpot?: boolean;
 }) {
+  const useJackpotText = accent || jackpot;
   return (
     <div
       className={`rounded-2xl border border-border/60 bg-card/60 p-5 backdrop-blur shine-on-hover ${
@@ -245,7 +305,11 @@ function HeroStat({
       <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-muted-foreground">
         {label}
       </p>
-      <p className={`mt-1 text-3xl font-black ${accent ? "text-jackpot" : ""}`}>
+      <p
+        className={`mt-1 text-3xl font-black ${
+          useJackpotText ? "text-jackpot" : ""
+        }`}
+      >
         {value}
       </p>
       <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>
@@ -259,16 +323,28 @@ function LiveTicker({ prices }: { prices: Record<string, number> }) {
   // Render the activity list twice for a seamless marquee loop.
   const items = [...LIVE_ACTIVITY, ...LIVE_ACTIVITY];
   return (
-    <section className="border-y border-border/60 bg-background/60 py-3 backdrop-blur">
-      <div className="overflow-hidden">
+    <section className="relative border-y border-border/60 bg-background/60 py-3 backdrop-blur">
+      <div className="relative overflow-hidden">
         <div className="marquee flex gap-12 whitespace-nowrap text-sm text-muted-foreground">
           {items.map((item, i) => (
             <span key={i} className="inline-flex items-center gap-2">
-              <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-primary/50" />
-              {formatActivity(item, prices)}
+              <span
+                aria-hidden
+                className={`h-2 w-2 rounded-full ${ACTIVITY_DOT[item.kind]}`}
+              />
+              {renderActivity(item, prices)}
             </span>
           ))}
         </div>
+        {/* Edge fade overlays — marquee dissolves into the page edges */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-background via-background/80 to-transparent"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-background via-background/80 to-transparent"
+        />
       </div>
     </section>
   );
@@ -283,19 +359,29 @@ function WhySection({
 }) {
   return (
     <section className="px-4 py-24">
-      <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-3">
-        {items.map((card, i) => (
-          <div
-            key={i}
-            className="ticket-card shine-on-hover p-6 transition-all hover:border-primary/40 hover:-translate-y-1"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-jackpot text-2xl glow-pink">
-              {card.emoji}
+      <div className="mx-auto max-w-5xl">
+        <div className="text-center">
+          <span className="text-xs font-medium uppercase tracking-[0.3em] text-accent">
+            Why LottoBlast
+          </span>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            Built for <span className="text-jackpot">payouts you can trust</span>
+          </h2>
+        </div>
+        <div className="mt-10 grid gap-6 sm:grid-cols-3">
+          {items.map((card, i) => (
+            <div
+              key={i}
+              className="ticket-card shine-on-hover p-6 transition-all hover:border-primary/40 hover:-translate-y-1"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-jackpot text-2xl glow-pink">
+                <span aria-hidden>{card.emoji}</span>
+              </div>
+              <h3 className="mt-4 text-lg font-bold">{card.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{card.body}</p>
             </div>
-            <h3 className="mt-4 text-lg font-bold">{card.title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{card.body}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -409,13 +495,21 @@ function Step({ n, title, body }: { n: string; title: string; body: string }) {
 function FinalCta() {
   return (
     <section className="px-4 pb-32">
-      <div className="relative mx-auto max-w-4xl overflow-hidden rounded-2xl border border-primary/40 bg-jackpot p-12 text-center shadow-2xl glow-pink">
-        <div className="absolute inset-0 bg-background/40 mix-blend-multiply" aria-hidden />
+      <div className="relative mx-auto max-w-4xl overflow-hidden rounded-2xl border border-primary/40 bg-jackpot p-12 text-center shadow-2xl glow-pink sm:p-16">
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-br from-background/30 via-transparent to-background/40"
+        />
+        {/* Decorative lottery ball nestled in the corner */}
+        <LotteryBall
+          className="float-slow absolute -right-6 -top-6 h-24 w-24 text-jackpot-gold opacity-40 sm:h-28 sm:w-28"
+          label="∞"
+        />
         <div className="relative">
           <span className="text-xs font-medium uppercase tracking-[0.3em] text-white/80">
             Ready to play?
           </span>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-5xl">
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] sm:text-5xl">
             Your jackpot is one signature away.
           </h2>
           <p className="mt-3 text-sm text-white/80">

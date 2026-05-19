@@ -21,7 +21,7 @@ import {
   isFactoryConfigured,
 } from "@/lib/contracts";
 import { getKnownTokens, findKnownToken, type TokenInfo } from "@/lib/tokens";
-import { displaySymbol } from "@/lib/format";
+import { displaySymbol, getExplorerTxUrl } from "@/lib/format";
 import erc20Abi from "@/lib/abi/erc20.json";
 import factoryAbi from "@/lib/abi/GiveawayFactory.json";
 
@@ -228,27 +228,136 @@ export default function CreateDrawPage() {
   }
 
   if (!isConnected || !address) {
+    const entry = displaySymbol(ENTRY_TOKEN_SYMBOL);
     return (
-      <main className="container mx-auto px-4 py-16">
-        <h1 className="mb-4 text-center text-4xl font-black tracking-tight">
-          <span className="text-jackpot">Run your own lottery</span>
-        </h1>
-        <p className="mx-auto max-w-md text-center text-sm text-muted-foreground">
-          One signature. Pick the prize token, set tier amounts and a ticket
-          price, share the link.
-        </p>
-        <div className="mt-8">
+      <main className="container mx-auto max-w-4xl px-4 py-16">
+        <header className="text-center">
+          <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.3em] text-accent">
+            🎰 For sponsors
+            <span className="rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] tracking-wider text-accent">
+              Admin wallet only
+            </span>
+          </span>
+          <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
+            <span className="text-jackpot">Run your own lottery</span>
+          </h1>
+          <p className="mx-auto mt-3 max-w-lg text-sm text-muted-foreground">
+            One signature. Pick the prize token, set tier amounts and a ticket
+            price, share the link. Chainlink VRF picks the winners. Payouts
+            settle on-chain.
+          </p>
+          <p className="mx-auto mt-3 max-w-lg text-xs text-muted-foreground/80">
+            Launching a draw is gated to the factory admin wallet during the
+            pilot. <Link href="/lotteries" className="text-primary underline underline-offset-2">Browse live draws</Link> as a player, or reach out on{" "}
+            <a href="https://t.me/lottoblast" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Telegram</a>{" "}
+            if you want sponsor access.
+          </p>
+        </header>
+
+        <div className="mt-10">
           <EmptyWalletState
             title="Connect a wallet to sponsor a draw"
-            description={`Players pay you ${displaySymbol(ENTRY_TOKEN_SYMBOL)} per ticket. You decide the prize token and amounts.`}
+            description={`Players pay you ${entry} per ticket. You decide the prize token and amounts.`}
           />
         </div>
+
+        {/* Value reinforcement — three crisp pillars so the page isn't dead-empty
+            below the wallet card and the brand stays present. */}
+        <ul className="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
+          {[
+            {
+              icon: "🔒",
+              title: "Escrowed prizes",
+              body: "Lock the prize tokens in the Giveaway contract before launch. No manual transfers.",
+            },
+            {
+              icon: "🎲",
+              title: "Provably-fair draw",
+              body: "Chainlink VRF picks winners on close. The seed is on-chain — auditable forever.",
+            },
+            {
+              icon: "⚡",
+              title: "Auto payout",
+              body: `Every ${entry} of entry fees pumps the 1st-place jackpot, then pays out on draw.`,
+            },
+          ].map((card) => (
+            <li
+              key={card.title}
+              className="group rounded-2xl border border-border/60 bg-card/40 p-5 backdrop-blur transition-colors hover:border-primary/40"
+            >
+              <span
+                aria-hidden
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-jackpot text-base shadow-sm shadow-primary/30"
+              >
+                {card.icon}
+              </span>
+              <h3 className="mt-3 text-sm font-bold tracking-tight">
+                {card.title}
+              </h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                {card.body}
+              </p>
+            </li>
+          ))}
+        </ul>
       </main>
     );
   }
 
   const symbol = displaySymbol(selectedToken?.symbol) || "—";
   const entrySymbol = displaySymbol(ENTRY_TOKEN_SYMBOL);
+
+  // If a wallet is connected but is NOT the factory admin, don't dump the
+  // user into a form they can't submit. Show a clear "sponsor access" surface
+  // with a forward path back to the player flow.
+  if (isFactoryConfigured && factoryOwner && !isFactoryOwner) {
+    return (
+      <main className="container mx-auto max-w-2xl px-4 py-16">
+        <header className="text-center">
+          <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.3em] text-accent">
+            🎰 For sponsors
+            <span className="rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-[10px] tracking-wider text-accent">
+              Admin wallet only
+            </span>
+          </span>
+          <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">
+            <span className="text-jackpot">Sponsor access required</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-lg text-sm text-muted-foreground">
+            Launching a draw is restricted to the factory admin during the
+            pilot. The wallet you connected (
+            <span className="font-mono">
+              {address.slice(0, 6)}…{address.slice(-4)}
+            </span>
+            ) isn&apos;t on the admin list.
+          </p>
+        </header>
+
+        <div className="mx-auto mt-10 max-w-md rounded-2xl border border-border/60 bg-card/60 p-6 text-center backdrop-blur">
+          <p className="text-sm text-muted-foreground">
+            Want to sponsor your community&apos;s next draw? Drop us a line and
+            we&apos;ll add your wallet to the allowlist.
+          </p>
+          <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a
+              href="https://t.me/lottoblast"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition-transform hover:-translate-y-0.5"
+            >
+              💬 Contact us on Telegram
+            </a>
+            <Link
+              href="/lotteries"
+              className="inline-flex items-center justify-center rounded-full border border-border/80 px-6 py-2.5 text-sm font-semibold text-foreground/90 transition-colors hover:border-accent/70 hover:text-accent"
+            >
+              🎟 Browse live draws
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="container mx-auto max-w-2xl px-4 py-12">
@@ -274,31 +383,61 @@ export default function CreateDrawPage() {
       >
         {/* Prize token picker */}
         <div className="space-y-2">
-          <Label htmlFor="prize-token">🏆 Prize token</Label>
-          <select
-            id="prize-token"
-            value={tokenChoice}
-            onChange={(e) => setTokenChoice(e.target.value)}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
-          >
-            {knownTokens.map((t) => (
-              <option key={t.address} value={t.address}>
-                {displaySymbol(t.symbol)} — {t.name}
-              </option>
-            ))}
-            <option value={CUSTOM_OPTION}>✏️ Custom token address…</option>
-          </select>
+          <Label htmlFor="prize-token">
+            <span aria-hidden>🏆</span> Prize token
+          </Label>
+          <div className="relative">
+            <select
+              id="prize-token"
+              value={tokenChoice}
+              onChange={(e) => setTokenChoice(e.target.value)}
+              className="flex h-10 w-full appearance-none rounded-md border border-input bg-background px-3 py-2 pr-9 text-sm transition-colors hover:border-primary/60 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              {knownTokens.map((t) => (
+                <option key={t.address} value={t.address}>
+                  {displaySymbol(t.symbol)} — {t.name}
+                </option>
+              ))}
+              <option value={CUSTOM_OPTION}>✏️ Custom token address…</option>
+            </select>
+            {/* Custom chevron — replaces browser-default arrow for a more crafted feel. */}
+            <svg
+              aria-hidden
+              viewBox="0 0 20 20"
+              fill="none"
+              className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            >
+              <path
+                d="m6 8 4 4 4-4"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
 
           {tokenChoice === CUSTOM_OPTION && (
             <div className="space-y-1.5">
+              <Label htmlFor="custom-token-address" className="sr-only">
+                Custom ERC-20 contract address
+              </Label>
               <Input
+                id="custom-token-address"
                 value={customAddress}
                 onChange={(e) => setCustomAddress(e.target.value)}
                 placeholder="0x… any ERC-20 on this chain"
+                aria-label="Custom ERC-20 contract address"
+                aria-invalid={
+                  customAddress.length > 0 && !isAddress(customAddress)
+                }
+                aria-describedby="custom-token-help"
                 className="font-mono text-xs"
               />
               {customAddress && !isAddress(customAddress) && (
-                <p className="text-xs text-destructive">Invalid address.</p>
+                <p id="custom-token-help" className="text-xs text-destructive">
+                  Invalid address.
+                </p>
               )}
               {customIsValid && customDecimals !== undefined && customSymbol ? (
                 <p className="text-xs text-emerald-400">
@@ -323,53 +462,73 @@ export default function CreateDrawPage() {
           <legend className="text-sm font-bold uppercase tracking-wider">
             Prize tiers ({symbol})
           </legend>
-          {tiers.map((t, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-jackpot text-sm font-bold text-white">
-                {t.rank}
-              </span>
-              <Input
-                type="number"
-                min="0"
-                step="any"
-                value={t.amount}
-                onChange={(e) => updateTier(i, e.target.value)}
-                placeholder="100"
-                required
-              />
-              {tiers.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeTier(i)}
+          {tiers.map((t, i) => {
+            const tierId = `tier-${t.rank}-amount`;
+            const placeOrdinal =
+              t.rank === 1 ? "1st place" : t.rank === 2 ? "2nd place" : t.rank === 3 ? "3rd place" : `${t.rank}th place`;
+            return (
+              <div key={i} className="flex items-center gap-3">
+                <Label htmlFor={tierId} className="sr-only">
+                  {placeOrdinal} prize amount in {symbol}
+                </Label>
+                <span
+                  aria-hidden
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-jackpot text-sm font-bold text-white shadow-sm shadow-primary/30"
                 >
-                  Remove
-                </Button>
-              )}
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addTier}
-            className="border-dashed"
-          >
-            + Add tier
-          </Button>
-          <p className="text-xs text-muted-foreground">
-            Total prize pool:{" "}
-            <strong className="text-foreground">
-              {totalPrize} {symbol}
-            </strong>
-          </p>
+                  {t.rank}
+                </span>
+                <Input
+                  id={tierId}
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={t.amount}
+                  onChange={(e) => updateTier(i, e.target.value)}
+                  placeholder="100"
+                  aria-label={`${placeOrdinal} prize amount in ${symbol}`}
+                  required
+                />
+                {tiers.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeTier(i)}
+                    aria-label={`Remove ${placeOrdinal} tier`}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addTier}
+              className="border-dashed border-primary/40 text-primary hover:border-primary hover:bg-primary/10 hover:text-primary"
+            >
+              + Add tier
+            </Button>
+            <p
+              className="text-xs text-muted-foreground"
+              aria-live="polite"
+            >
+              Total prize pool:{" "}
+              <strong className="text-jackpot text-sm font-bold">
+                {totalPrize} {symbol}
+              </strong>
+            </p>
+          </div>
         </fieldset>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="entry-fee">
-              🎟 Ticket price ({entrySymbol})
+              <span aria-hidden>🎟</span> Ticket price ({entrySymbol})
             </Label>
             <Input
               id="entry-fee"
@@ -385,7 +544,9 @@ export default function CreateDrawPage() {
             </p>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="duration">⏰ Duration (days)</Label>
+            <Label htmlFor="duration">
+              <span aria-hidden>⏰</span> Duration (days)
+            </Label>
             <Input
               id="duration"
               type="number"
@@ -398,11 +559,13 @@ export default function CreateDrawPage() {
           </div>
         </div>
 
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        )}
+        <div role="status" aria-live="polite" className="min-h-0">
+          {error && (
+            <p className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
+        </div>
 
         {createdAddress && (
           <div className="rounded-lg bg-emerald-500/10 p-4 text-sm text-emerald-400">
@@ -421,7 +584,16 @@ export default function CreateDrawPage() {
 
         {createdTx && !createdAddress && (
           <p className="text-sm text-muted-foreground">
-            Tx submitted: {createdTx.slice(0, 12)}… waiting for confirmation…
+            Tx submitted:{" "}
+            <a
+              href={getExplorerTxUrl(createdTx)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-mono underline hover:text-primary"
+            >
+              {createdTx.slice(0, 12)}…
+            </a>{" "}
+            waiting for confirmation…
           </p>
         )}
 

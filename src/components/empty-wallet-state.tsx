@@ -12,8 +12,8 @@ export function EmptyWalletState({
   description = "LottoBlast uses your wallet as your identity. No email, no password — connect to see your entries, claims, and campaigns.",
 }: EmptyWalletStateProps) {
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-4 rounded-xl border border-dashed border-border p-12 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+    <div className="ticket-card mx-auto flex max-w-md flex-col items-center gap-4 p-12 text-center">
+      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-jackpot text-white glow-pink">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -22,7 +22,7 @@ export function EmptyWalletState({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="h-6 w-6"
+          className="h-7 w-7"
           aria-hidden
         >
           <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />

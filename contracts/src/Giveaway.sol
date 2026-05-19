@@ -100,6 +100,13 @@ contract Giveaway is Ownable {
         require(block.timestamp < endAt, "giveaway has ended");
         require(!hasEntered[msg.sender], "already entered");
 
+        // CEI: set state flags BEFORE the external token transfer so an
+        // ERC777/ERC677-style callback cannot re-enter enter() for the same
+        // address. Entry token in production is USDT/USDC (no callbacks),
+        // but defensive ordering is cheap.
+        hasEntered[msg.sender] = true;
+        entrantsSet.add(msg.sender);
+
         if (entryFee > 0) {
             // Ticket fee stays in the contract as sponsor revenue. The jackpot
             // is fixed at sponsor-set tier amounts; fees do NOT grow the
@@ -107,9 +114,6 @@ contract Giveaway is Ownable {
             // discretion.
             entryToken.safeTransferFrom(msg.sender, address(this), entryFee);
         }
-
-        hasEntered[msg.sender] = true;
-        entrantsSet.add(msg.sender);
         // newBonusPool param stays in the event signature for ABI compatibility
         // but is always 0 in this design.
         emit Entered(msg.sender, entryFee, 0);
@@ -230,6 +234,8 @@ contract Giveaway is Ownable {
     ///         to prevent the sponsor draining the prize pool or entrants' fees.
     function rescueTokens(IERC20 token, address to, uint256 amount) external onlyOwner {
         require(to != address(0), "to is zero address");
+        require(address(token) != address(prizeToken), "cannot rescue prize token");
+        require(address(token) != address(entryToken), "cannot rescue entry token");
         token.safeTransfer(to, amount);
         emit TokensRescued(address(token), to, amount);
     }

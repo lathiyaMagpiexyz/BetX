@@ -13,6 +13,7 @@ import {
   formatTimeRemaining,
   formatTokenAmount,
   formatUsd,
+  getExplorerTxUrl,
   statusLabel,
 } from "@/lib/format";
 import {
@@ -154,8 +155,15 @@ export function LotteryDetailClient({ initial }: Props) {
           helper:
             "Run forge script script/Deploy.s.sol --broadcast and set NEXT_PUBLIC_GIVEAWAY_FACTORY_ADDRESS.",
         };
-      if (onChain.isEntering)
-        return { label: "Confirming…", disabled: true };
+      if (onChain.isEntering || onChain.enterStep !== "idle") {
+        const stepLabel =
+          onChain.enterStep === "approving"
+            ? `Approving ${entrySymbol}… (1 of 2)`
+            : onChain.enterStep === "entering"
+            ? "Submitting ticket… (2 of 2)"
+            : "Confirming…";
+        return { label: stepLabel, disabled: true };
+      }
       return {
         label: `🎟 Buy ticket (${formatEntry(liveEntryFee)} ${entrySymbol})`,
         disabled: false,
@@ -167,7 +175,13 @@ export function LotteryDetailClient({ initial }: Props) {
       {/* Status banner */}
       <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
         <span className="rounded-full bg-primary/15 px-2.5 py-1 font-bold text-primary">
-          {status === 0 ? "🎟 Live draw" : statusLabel(status)}
+          {status === 0 ? (
+            <>
+              <span aria-hidden>🎟</span> Live draw
+            </>
+          ) : (
+            statusLabel(status)
+          )}
         </span>
         <span>·</span>
         <span>
@@ -175,14 +189,29 @@ export function LotteryDetailClient({ initial }: Props) {
         </span>
       </div>
 
-      {/* Hero jackpot number */}
-      <div className="rounded-2xl border border-border/60 bg-card/50 p-8 text-center backdrop-blur sm:p-12">
+      {/* Hero jackpot number — elevated ticket-card with perforated edges */}
+      <div className="ticket-card relative p-8 text-center sm:p-12">
+        {/* Perforated rails on the left and right edges */}
+        <div
+          aria-hidden
+          className="perforation pointer-events-none absolute inset-y-0 left-0 w-2"
+        />
+        <div
+          aria-hidden
+          className="perforation pointer-events-none absolute inset-y-0 right-0 w-2"
+        />
         <div className="text-xs font-medium uppercase tracking-[0.3em] text-accent">
           Total jackpot
         </div>
-        <div className="prize-pulse mt-3 text-6xl font-black tracking-tight text-jackpot sm:text-7xl">
-          {formatTokenAmount(totalPool, prizeDecimals, 0)}
-        </div>
+        {totalPool === 0n ? (
+          <div className="prize-pulse mt-3 text-3xl font-bold tracking-tight text-muted-foreground sm:text-4xl">
+            Awaiting prize confirmation
+          </div>
+        ) : (
+          <div className="prize-pulse mt-3 text-6xl font-black tracking-tight text-jackpot sm:text-7xl">
+            {formatTokenAmount(totalPool, prizeDecimals, 0)}
+          </div>
+        )}
         <div className="mt-2 text-sm font-medium text-muted-foreground">
           {prizeSymbol}
         </div>
@@ -249,7 +278,15 @@ export function LotteryDetailClient({ initial }: Props) {
           </div>
           {selectionSuccess && (
             <p className="mt-4 rounded-lg bg-emerald-500/10 p-3 text-sm text-emerald-400">
-              ✅ Winners confirmed on-chain. Tx: {selectionSuccess.slice(0, 12)}…
+              ✅ Winners confirmed on-chain.{" "}
+              <a
+                href={getExplorerTxUrl(selectionSuccess)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono underline hover:text-emerald-300"
+              >
+                {selectionSuccess.slice(0, 12)}…
+              </a>
             </p>
           )}
           <Button
@@ -298,14 +335,24 @@ export function LotteryDetailClient({ initial }: Props) {
               {buttonState.helper}
             </p>
           )}
-          {error && (
-            <p role="alert" className="mt-2 text-sm text-destructive">
-              {error}
-            </p>
-          )}
+          <div role="status" aria-live="polite" className="min-h-0">
+            {error && (
+              <p className="mt-2 text-sm text-destructive">
+                {error}
+              </p>
+            )}
+          </div>
           {txHash && (
             <p className="mt-2 text-sm text-emerald-400">
-              ✅ Ticket confirmed: {txHash.slice(0, 12)}…
+              ✅ Ticket confirmed:{" "}
+              <a
+                href={getExplorerTxUrl(txHash)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono underline hover:text-emerald-300"
+              >
+                {txHash.slice(0, 12)}…
+              </a>
             </p>
           )}
         </div>
