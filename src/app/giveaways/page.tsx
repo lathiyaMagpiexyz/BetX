@@ -8,9 +8,9 @@ import {
 } from "@/lib/supabase";
 
 export const metadata = {
-  title: "Live BSC project giveaways · LottoBlast",
+  title: "Live BSC project giveaways · FairDrop",
   description:
-    "Browse every live LottoBlast giveaway — emerging BSC projects locking up tokens for their community. Pay USDT to enter in one signature.",
+    "Browse every live FairDrop giveaway — emerging BSC projects locking up tokens for their community. Pay USDT to enter in one signature.",
 };
 
 export const dynamic = "force-dynamic";

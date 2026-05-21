@@ -178,7 +178,7 @@ export const wagmiConfig = isDemoWeb3
       ssr: true,
     })
   : getDefaultConfig({
-      appName: "LottoBlast",
+      appName: "FairDrop",
       projectId: wcProjectId,
       chains: [targetChain],
       transports: {
@@ -189,7 +189,7 @@ export const wagmiConfig = isDemoWeb3
       },
       connectors: [
         injected({ shimDisconnect: true }),
-        coinbaseWallet({ appName: "LottoBlast" }),
+        coinbaseWallet({ appName: "FairDrop" }),
         walletConnect({ projectId: wcProjectId }),
       ],
       ssr: true,

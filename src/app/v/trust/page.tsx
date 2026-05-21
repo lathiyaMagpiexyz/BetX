@@ -3,7 +3,7 @@ import { fetchActiveGiveaways } from "@/lib/supabase";
 import { fetchTokenPrices } from "@/lib/prices";
 
 export const metadata = {
-  title: "LottoBlast — Discover New BSC Projects. Win Their Tokens.",
+  title: "FairDrop — Discover New BSC Projects. Win Their Tokens.",
   description:
     "Emerging BSC projects launch on-chain giveaways. Pay USDT to enter, win their tokens when entries close. No middleman, no DM-the-winner runaround.",
 };

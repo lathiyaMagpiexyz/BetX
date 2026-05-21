@@ -9,7 +9,7 @@ interface EmptyWalletStateProps {
 
 export function EmptyWalletState({
   title = "Connect your wallet to continue",
-  description = "LottoBlast uses your wallet as your identity. No email, no password — connect to see your entries, claims, and campaigns.",
+  description = "FairDrop uses your wallet as your identity. No email, no password — connect to see your entries, claims, and campaigns.",
 }: EmptyWalletStateProps) {
   return (
     <div className="ticket-card mx-auto flex max-w-md flex-col items-center gap-4 p-12 text-center">

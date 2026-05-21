@@ -300,7 +300,7 @@ export function GiveawayDetailClient({ initial }: Props) {
         </section>
       ) : null}
 
-      {/* How a LottoBlast giveaway works */}
+      {/* How a FairDrop giveaway works */}
       <section className="mt-10 rounded-2xl border border-border/60 bg-card/50 p-6 backdrop-blur">
         <h2 className="text-base font-bold uppercase tracking-wider text-muted-foreground">
           How this giveaway works

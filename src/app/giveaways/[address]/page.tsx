@@ -12,9 +12,9 @@ export async function generateMetadata({
 }) {
   const { address } = await params;
   return {
-    title: `Draw ${address.slice(0, 6)}…${address.slice(-4)} · LottoBlast`,
+    title: `Draw ${address.slice(0, 6)}…${address.slice(-4)} · FairDrop`,
     description:
-      "Buy a ticket for this LottoBlast draw. One signature, on-chain payout, sponsor-selected winners.",
+      "Buy a ticket for this FairDrop draw. One signature, on-chain payout, sponsor-selected winners.",
   };
 }
 

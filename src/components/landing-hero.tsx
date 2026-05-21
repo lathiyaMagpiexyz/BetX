@@ -361,7 +361,7 @@ function WhySection({
       <div className="mx-auto max-w-5xl">
         <div className="text-center">
           <span className="text-xs font-medium uppercase tracking-[0.3em] text-accent">
-            Why LottoBlast
+            Why FairDrop
           </span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
             Built for <span className="text-jackpot">payouts you can trust</span>
@@ -458,7 +458,7 @@ function HowItWorks() {
       <div className="mx-auto max-w-5xl rounded-2xl border border-border/60 bg-card/50 p-8 backdrop-blur sm:p-12 shine-on-hover">
         <div className="text-center">
           <span className="text-xs font-medium uppercase tracking-[0.3em] text-accent">
-            How a LottoBlast giveaway works
+            How a FairDrop giveaway works
           </span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
             Three steps. <span className="text-jackpot">Zero spreadsheets.</span>

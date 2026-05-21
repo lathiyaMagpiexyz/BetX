@@ -7,14 +7,14 @@ import { NavBar } from "@/components/nav-bar";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "LottoBlast — Discover New BSC Projects. Win Their Tokens.",
+  title: "FairDrop — Discover New BSC Projects. Win Their Tokens.",
   description:
     "Emerging BSC projects launch on-chain giveaways. Pay a small USDT entry fee, get a shot at their tokens. Winners paid on-chain — no Twitter giveaways, no 'DM the winner.'",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
   ),
   openGraph: {
-    title: "LottoBlast — Discover New BSC Projects. Win Their Tokens.",
+    title: "FairDrop — Discover New BSC Projects. Win Their Tokens.",
     description:
       "Emerging BSC projects giveaway tokens on-chain. Pay USDT to enter, win their tokens, paid instantly on close.",
     type: "website",

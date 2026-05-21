@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "LottoBlast — Discover New BSC Projects. Win Their Tokens.";
+export const alt = "FairDrop — Discover New BSC Projects. Win Their Tokens.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -50,7 +50,7 @@ export default async function OpenGraphImage() {
                 boxShadow: "0 0 48px rgba(247, 73, 158, 0.55)",
               }}
             >
-              L
+              F
             </div>
             <div
               style={{
@@ -63,7 +63,7 @@ export default async function OpenGraphImage() {
                 color: "transparent",
               }}
             >
-              LottoBlast
+              FairDrop
             </div>
           </div>
           <div

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "How LottoBlast works · BSC project giveaways, on-chain",
+  title: "How FairDrop works · BSC project giveaways, on-chain",
   description:
     "A 3-step walkthrough: how BSC projects launch a giveaway, how players enter, how winners get paid on-chain. No middleman, no DM-the-winner.",
 };
@@ -15,7 +15,7 @@ export default function HowItWorksPage() {
           🎰 How it works
         </span>
         <h1 className="mt-3 text-balance text-4xl font-black tracking-tight sm:text-5xl">
-          <span className="text-jackpot">A LottoBlast giveaway</span>,
+          <span className="text-jackpot">A FairDrop giveaway</span>,
           end-to-end
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-balance text-base text-muted-foreground">

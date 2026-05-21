@@ -32,10 +32,10 @@ export function NavBar() {
             aria-hidden
             className="flex h-8 w-8 items-center justify-center rounded-md bg-jackpot text-base font-bold text-white shadow-lg shadow-primary/30 transition-transform group-hover:scale-105"
           >
-            L
+            F
           </span>
           <span className="text-lg font-bold tracking-tight text-jackpot">
-            LottoBlast
+            FairDrop
           </span>
         </Link>
 

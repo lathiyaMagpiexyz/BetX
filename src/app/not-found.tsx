@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Page not found · LottoBlast",
-  description: "The page you were looking for doesn't exist on LottoBlast.",
+  title: "Page not found · FairDrop",
+  description: "The page you were looking for doesn't exist on FairDrop.",
 };
 
 export default function NotFound() {
@@ -15,7 +15,7 @@ export default function NotFound() {
         <span className="text-jackpot">This giveaway doesn&apos;t exist.</span>
       </h1>
       <p className="mx-auto mt-4 max-w-md text-sm text-muted-foreground">
-        The page or giveaway address you opened isn&apos;t on LottoBlast. It
+        The page or giveaway address you opened isn&apos;t on FairDrop. It
         may have been removed, mistyped, or never existed in the first place.
       </p>
       <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

@@ -77,7 +77,7 @@ export const wagmiConfig = isDemoWeb3
       ssr: true,
     })
   : getDefaultConfig({
-      appName: "LottoBlast",
+      appName: "FairDrop",
       projectId: wcProjectId,
       chains: [targetChain],
       transports: { [targetChain.id]: buildTransport(targetChain) },

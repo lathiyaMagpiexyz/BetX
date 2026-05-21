@@ -19,23 +19,23 @@ async function requestAccountPicker(): Promise<boolean> {
   if (typeof window === "undefined") return false;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const eth = (window as any).ethereum;
-  console.log("[lottoblast-connect] window.ethereum:", eth);
-  console.log("[lottoblast-connect] isMetaMask:", eth?.isMetaMask);
-  console.log("[lottoblast-connect] providers:", eth?.providers);
+  console.log("[fairdrop-connect] window.ethereum:", eth);
+  console.log("[fairdrop-connect] isMetaMask:", eth?.isMetaMask);
+  console.log("[fairdrop-connect] providers:", eth?.providers);
   if (!eth || typeof eth.request !== "function") {
-    console.error("[lottoblast-connect] No EIP-1193 provider found on window.ethereum");
+    console.error("[fairdrop-connect] No EIP-1193 provider found on window.ethereum");
     return false;
   }
   try {
-    console.log("[lottoblast-connect] Calling wallet_requestPermissions...");
+    console.log("[fairdrop-connect] Calling wallet_requestPermissions...");
     const result = await eth.request({
       method: "wallet_requestPermissions",
       params: [{ eth_accounts: {} }],
     });
-    console.log("[lottoblast-connect] permissions returned:", result);
+    console.log("[fairdrop-connect] permissions returned:", result);
     return true;
   } catch (err) {
-    console.error("[lottoblast-connect] requestPermissions threw:", err);
+    console.error("[fairdrop-connect] requestPermissions threw:", err);
     return false;
   }
 }
@@ -47,20 +47,20 @@ export function ConnectWalletButton({ className }: ConnectWalletButtonProps) {
 
   if (isDemoWeb3) {
     async function handleConnect() {
-      console.log("[lottoblast-connect] handleConnect fired");
-      console.log("[lottoblast-connect] available connectors:", connectors.map(c => ({ id: c.id, name: c.name })));
+      console.log("[fairdrop-connect] handleConnect fired");
+      console.log("[fairdrop-connect] available connectors:", connectors.map(c => ({ id: c.id, name: c.name })));
       // Force account picker even if MetaMask already has a permission for this site.
       const picked = await requestAccountPicker();
-      console.log("[lottoblast-connect] picked:", picked);
+      console.log("[fairdrop-connect] picked:", picked);
       if (!picked) return;
 
       const injected = connectors.find((c) => c.id === "injected");
-      console.log("[lottoblast-connect] injected connector:", injected);
+      console.log("[fairdrop-connect] injected connector:", injected);
       if (injected) {
         connect({ connector: injected });
-        console.log("[lottoblast-connect] connect() called");
+        console.log("[fairdrop-connect] connect() called");
       } else {
-        console.error("[lottoblast-connect] No injected connector available");
+        console.error("[fairdrop-connect] No injected connector available");
       }
     }
 

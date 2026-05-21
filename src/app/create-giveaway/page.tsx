@@ -249,7 +249,7 @@ export default function CreateGiveawayPage() {
           <p className="mx-auto mt-3 max-w-lg text-xs text-muted-foreground/80">
             Launching a giveaway is gated to the factory admin wallet during the
             pilot. <Link href="/giveaways" className="text-primary underline underline-offset-2">Browse live giveaways</Link> as a player, or reach out on{" "}
-            <a href="https://t.me/lottoblast" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Telegram</a>{" "}
+            <a href="https://t.me/fairdrop" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">Telegram</a>{" "}
             if you want sponsor access.
           </p>
         </header>
@@ -340,7 +340,7 @@ export default function CreateGiveawayPage() {
           </p>
           <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
-              href="https://t.me/lottoblast"
+              href="https://t.me/fairdrop"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground transition-transform hover:-translate-y-0.5"

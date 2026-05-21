@@ -3,7 +3,7 @@ import { fetchActiveGiveaways } from "@/lib/supabase";
 import { fetchTokenPrices } from "@/lib/prices";
 
 export const metadata = {
-  title: "LottoBlast — Get Your BSC Token in Real Wallets",
+  title: "FairDrop — Get Your BSC Token in Real Wallets",
   description:
     "Launch a token giveaway for your BSC project in one transaction. Lock the tokens, set the entry fee, share the link. Reach 10,000+ crypto-native wallets.",
 };
