@@ -1,13 +1,18 @@
 /**
- * Live token prices used for the demo USD displays on the landing page.
+ * Live token prices used for the USD displays across the platform.
  *
- * Pulls from Binance's free public ticker (no auth, no rate-limit headaches
- * for low volume). Cached server-side for 60s via Next.js fetch cache, so the
- * landing page does not hit the API on every request.
+ * Source: **CoinGecko public API** (free, no auth for ~10-50 calls/min).
+ * We previously used Binance, but `api.binance.com` is geo-blocked from
+ * US IP ranges — Vercel's serverless runtime lives in `iad1` (us-east-1)
+ * by default, so every server-side fetch failed and quietly fell back to
+ * stale constants. CoinGecko serves globally and is the standard crypto
+ * price oracle for non-trading dApps.
  *
- * Stable-pegged tokens (USDT / USDC / BUSD) are returned as a flat 1.0 —
- * Binance lists them all against USDT itself, so there is nothing to fetch.
- * Replace this with a Chainlink price feed read before mainnet.
+ * Cached server-side for 60s via Next.js fetch cache so the page doesn't
+ * hit CoinGecko on every request. Stable-pegged tokens (USDT/USDC/BUSD)
+ * are returned as a flat 1.0 — no fetch needed.
+ *
+ * Replace with a Chainlink price feed read before scaling to high TVL.
  */
 
 const FALLBACK_PRICES: Record<string, number> = {
@@ -15,49 +20,66 @@ const FALLBACK_PRICES: Record<string, number> = {
   USDT: 1,
   USDC: 1,
   BUSD: 1,
-  // Blue-chip BSC
+  // Blue-chip BSC — fallbacks reflect rough current market
   WBNB: 600,
   CAKE: 2.5,
-  // Emerging BSC project tokens (featured on the landing as giveaway prizes)
-  HOOK: 0.12,
-  LISTA: 0.3,
-  WOO: 0.18,
-  BAKE: 0.22,
-  FLOKI: 0.00012,
+  // Emerging BSC project tokens featured on the landing as giveaway prizes
+  HOOK: 0.008,
+  LISTA: 0.18,
+  WOO: 0.06,
+  BAKE: 0.1,
+  FLOKI: 0.00007,
   XVS: 5,
-  TWT: 1.0,
-  THE: 0.25,
-  BSW: 0.05,
+  TWT: 0.5,
+  THE: 0.15,
+  BSW: 0.02,
 };
 
-const BINANCE_SYMBOLS: Array<{ pair: string; token: keyof typeof FALLBACK_PRICES }> = [
-  { pair: "BNBUSDT", token: "WBNB" },
-  { pair: "CAKEUSDT", token: "CAKE" },
-  { pair: "HOOKUSDT", token: "HOOK" },
-  { pair: "LISTAUSDT", token: "LISTA" },
-  { pair: "WOOUSDT", token: "WOO" },
-  { pair: "BAKEUSDT", token: "BAKE" },
-  { pair: "FLOKIUSDT", token: "FLOKI" },
-  { pair: "XVSUSDT", token: "XVS" },
-  { pair: "TWTUSDT", token: "TWT" },
-  // THE (Thena) is BSC-DEX-only — no Binance pair; FALLBACK_PRICES applies
-  { pair: "BSWUSDT", token: "BSW" },
-];
+// CoinGecko coin IDs for each token symbol. Discover IDs via
+// https://api.coingecko.com/api/v3/coins/list or the project's CoinGecko
+// page URL (e.g., coingecko.com/en/coins/hooked-protocol).
+const COINGECKO_IDS: Record<keyof typeof FALLBACK_PRICES, string | null> = {
+  USDT: null,
+  USDC: null,
+  BUSD: null,
+  WBNB: "binancecoin", // BNB price; wrapped BNB tracks 1:1
+  CAKE: "pancakeswap-token",
+  HOOK: "hooked-protocol",
+  LISTA: "lista-dao",
+  WOO: "woo-network",
+  BAKE: "bakerytoken",
+  FLOKI: "floki",
+  XVS: "venus",
+  TWT: "trust-wallet-token",
+  THE: "thena",
+  BSW: "biswap",
+};
 
 export async function fetchTokenPrices(): Promise<Record<string, number>> {
-  const url =
-    'https://api.binance.com/api/v3/ticker/price?symbols=' +
-    encodeURIComponent(JSON.stringify(BINANCE_SYMBOLS.map((s) => s.pair)));
+  const idToSymbol = new Map<string, string>();
+  for (const [symbol, id] of Object.entries(COINGECKO_IDS)) {
+    if (id) idToSymbol.set(id, symbol);
+  }
+  if (idToSymbol.size === 0) return FALLBACK_PRICES;
+
+  const ids = Array.from(idToSymbol.keys()).join(",");
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(ids)}&vs_currencies=usd`;
+
   try {
-    const res = await fetch(url, { next: { revalidate: 60 } });
+    const res = await fetch(url, {
+      next: { revalidate: 60 },
+      headers: { Accept: "application/json" },
+    });
     if (!res.ok) return FALLBACK_PRICES;
-    const data = (await res.json()) as Array<{ symbol: string; price: string }>;
+    const data = (await res.json()) as Record<string, { usd?: number }>;
     const prices: Record<string, number> = { ...FALLBACK_PRICES };
-    for (const row of data) {
-      const entry = BINANCE_SYMBOLS.find((s) => s.pair === row.symbol);
-      if (!entry) continue;
-      const value = parseFloat(row.price);
-      if (Number.isFinite(value) && value > 0) prices[entry.token] = value;
+    for (const [id, payload] of Object.entries(data)) {
+      const symbol = idToSymbol.get(id);
+      if (!symbol) continue;
+      const usd = payload?.usd;
+      if (typeof usd === "number" && Number.isFinite(usd) && usd > 0) {
+        prices[symbol] = usd;
+      }
     }
     return prices;
   } catch {
