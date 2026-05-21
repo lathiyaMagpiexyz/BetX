@@ -25,9 +25,10 @@ import type { IndexedGiveaway } from "@/lib/supabase";
 
 interface Props {
   initial: IndexedGiveaway;
+  prices: Record<string, number>;
 }
 
-export function GiveawayDetailClient({ initial }: Props) {
+export function GiveawayDetailClient({ initial, prices }: Props) {
   const giveaway = initial;
   const address = giveaway.address as Address;
   const { address: userAddress, isConnected } = useAccount();
@@ -48,11 +49,13 @@ export function GiveawayDetailClient({ initial }: Props) {
   );
   const entrySymbol = displaySymbol(ENTRY_TOKEN_SYMBOL);
   const prizeDecimals = giveaway.prize_token_decimals ?? ENTRY_TOKEN_DECIMALS;
-  const prizeUsd = formatUsd(
-    totalPool,
-    prizeDecimals,
-    giveaway.prize_token_usd_price
-  );
+  // Prefer the LIVE Binance price (passed in from the server component) over
+  // the stale `usdPrice` constant baked into tokens.ts via onchain.ts. The
+  // page-level fetch is cached 60s in prices.ts so this is cheap. Falls back
+  // to the static value only if the live map has no entry for this symbol.
+  const livePrice = prices[prizeSymbol];
+  const effectivePrice = livePrice ?? giveaway.prize_token_usd_price;
+  const prizeUsd = formatUsd(totalPool, prizeDecimals, effectivePrice);
   const liveStatus = (onChain.state as readonly bigint[] | undefined)?.[0];
   const numWinners = Number(
     (onChain.state as readonly bigint[] | undefined)?.[4] ?? 0n
