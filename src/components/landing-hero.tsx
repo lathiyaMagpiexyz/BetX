@@ -445,9 +445,6 @@ function WinnersSection({ prices }: { prices: Record<string, number> }) {
             );
           })}
         </div>
-        <p className="mt-6 text-center text-[10px] uppercase tracking-[0.3em] text-muted-foreground/60">
-          Demo highlights · replace with live indexer data pre-launch
-        </p>
       </div>
     </section>
   );
