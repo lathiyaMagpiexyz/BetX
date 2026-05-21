@@ -10,6 +10,7 @@ import type { IndexedGiveaway } from "@/lib/supabase";
 
 interface Props {
   giveaway: IndexedGiveaway;
+  prices?: Record<string, number>;
 }
 
 function settledAgo(endAt: string): string {
@@ -23,11 +24,14 @@ function settledAgo(endAt: string): string {
   return `${Math.floor(diff / 86_400 / 30)}mo ago`;
 }
 
-export function SettledGiveawayCard({ giveaway }: Props) {
+export function SettledGiveawayCard({ giveaway, prices }: Props) {
   const prizePool = BigInt(giveaway.prize_pool);
   const prizeSymbol = giveaway.prize_token_symbol ?? ENTRY_TOKEN_SYMBOL;
   const prizeDecimals = giveaway.prize_token_decimals ?? ENTRY_TOKEN_DECIMALS;
-  const prizeUsd = formatUsd(prizePool, prizeDecimals, giveaway.prize_token_usd_price);
+  const displayedSymbol = displaySymbol(prizeSymbol);
+  const livePrice = prices?.[displayedSymbol];
+  const effectivePrice = livePrice ?? giveaway.prize_token_usd_price;
+  const prizeUsd = formatUsd(prizePool, prizeDecimals, effectivePrice);
   const winners = giveaway.winners ?? [];
   const firstPlace = winners[0];
 

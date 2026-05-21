@@ -12,9 +12,14 @@ import type { IndexedGiveaway } from "@/lib/supabase";
 
 interface GiveawayCardProps {
   giveaway: IndexedGiveaway;
+  // Live token prices map (CoinGecko-backed, passed in from the page-level
+  // server component). When present and the prize symbol matches, this
+  // overrides the stale `usdPrice` constant baked into tokens.ts via
+  // onchain.ts. Falls back to the static value if the live map has no entry.
+  prices?: Record<string, number>;
 }
 
-export function GiveawayCard({ giveaway }: GiveawayCardProps) {
+export function GiveawayCard({ giveaway, prices }: GiveawayCardProps) {
   // Prize pool is fixed at sponsor-set tier amounts. Entry fees are NOT added
   // to the pool — they stay in the contract as sponsor revenue.
   const totalPool = BigInt(giveaway.prize_pool);
@@ -26,11 +31,10 @@ export function GiveawayCard({ giveaway }: GiveawayCardProps) {
   // defaults only if the resolver couldn't read the token.
   const prizeSymbol = giveaway.prize_token_symbol ?? ENTRY_TOKEN_SYMBOL;
   const prizeDecimals = giveaway.prize_token_decimals ?? ENTRY_TOKEN_DECIMALS;
-  const prizeUsd = formatUsd(
-    totalPool,
-    prizeDecimals,
-    giveaway.prize_token_usd_price
-  );
+  const displayedSymbol = displaySymbol(prizeSymbol);
+  const livePrice = prices?.[displayedSymbol];
+  const effectivePrice = livePrice ?? giveaway.prize_token_usd_price;
+  const prizeUsd = formatUsd(totalPool, prizeDecimals, effectivePrice);
 
   return (
     <Link
@@ -68,7 +72,7 @@ export function GiveawayCard({ giveaway }: GiveawayCardProps) {
             {formatTokenAmount(totalPool, prizeDecimals, 0)}
           </div>
           <div className="mt-1 text-sm font-medium text-muted-foreground">
-            {displaySymbol(prizeSymbol)}
+            {displayedSymbol}
           </div>
           {prizeUsd && (
             <div className="mt-0.5 text-xs text-muted-foreground/70">

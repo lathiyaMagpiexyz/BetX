@@ -6,6 +6,7 @@ import {
   fetchSettledGiveaways,
   isSupabaseConfigured,
 } from "@/lib/supabase";
+import { fetchTokenPrices } from "@/lib/prices";
 
 export const metadata = {
   title: "Live BSC project giveaways · FairDrop",
@@ -32,9 +33,13 @@ function dataSourceLabel(): string {
 }
 
 export default async function GiveawaysPage() {
-  const [live, settled] = await Promise.all([
+  // Live token prices fetched server-side (CoinGecko, 60s cache) so card
+  // USD figures match the detail page instead of using stale tokens.ts
+  // constants via prize_token_usd_price.
+  const [live, settled, prices] = await Promise.all([
     fetchActiveGiveaways(),
     fetchSettledGiveaways(12),
+    fetchTokenPrices(),
   ]);
 
   return (
@@ -130,7 +135,7 @@ export default async function GiveawaysPage() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {live.map((g) => (
-              <GiveawayCard key={g.address} giveaway={g} />
+              <GiveawayCard key={g.address} giveaway={g} prices={prices} />
             ))}
           </div>
         )}
@@ -154,7 +159,11 @@ export default async function GiveawaysPage() {
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {settled.map((g) => (
-              <SettledGiveawayCard key={g.address} giveaway={g} />
+              <SettledGiveawayCard
+                key={g.address}
+                giveaway={g}
+                prices={prices}
+              />
             ))}
           </div>
         </section>
