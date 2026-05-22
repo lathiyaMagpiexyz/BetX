@@ -8,6 +8,17 @@ const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 export const isSupabaseConfigured =
   !!url && !!anon && url !== PLACEHOLDER_URL;
 
+// Giveaway contract addresses to hide from the frontend entirely.
+// Listing pages skip them and `/giveaways/<address>` returns 404. The contracts
+// remain live on-chain — this only affects what FairDrop's UI surfaces.
+const HIDDEN_GIVEAWAYS = new Set<string>([
+  "0xa148913ac207840a8c6f2dd833c794934316d211",
+]);
+
+function isHiddenGiveaway(address: string): boolean {
+  return HIDDEN_GIVEAWAYS.has(address.toLowerCase());
+}
+
 let _client: SupabaseClient | null = null;
 
 /**
@@ -139,7 +150,9 @@ export async function fetchActiveGiveaways(): Promise<IndexedGiveaway[]> {
     const { fetchOnchainGiveaways } = await import("@/lib/onchain");
     const onchain = await fetchOnchainGiveaways();
     if (onchain === null) return getDemoGiveaways();
-    return onchain.filter((g) => g.status !== "Resolved");
+    return onchain.filter(
+      (g) => g.status !== "Resolved" && !isHiddenGiveaway(g.address)
+    );
   }
 
   const { data, error } = await supabase
@@ -153,7 +166,9 @@ export async function fetchActiveGiveaways(): Promise<IndexedGiveaway[]> {
     console.error("[supabase] fetchActiveGiveaways error", error);
     return [];
   }
-  return (data ?? []) as IndexedGiveaway[];
+  return ((data ?? []) as IndexedGiveaway[]).filter(
+    (g) => !isHiddenGiveaway(g.address)
+  );
 }
 
 /**
@@ -168,7 +183,9 @@ export async function fetchSettledGiveaways(
     const { fetchOnchainGiveaways } = await import("@/lib/onchain");
     const onchain = await fetchOnchainGiveaways();
     if (onchain === null) return [];
-    return onchain.filter((g) => g.status === "Resolved").slice(0, limit);
+    return onchain
+      .filter((g) => g.status === "Resolved" && !isHiddenGiveaway(g.address))
+      .slice(0, limit);
   }
 
   const { data, error } = await supabase
@@ -183,12 +200,16 @@ export async function fetchSettledGiveaways(
     console.error("[supabase] fetchSettledGiveaways error", error);
     return [];
   }
-  return (data ?? []) as IndexedGiveaway[];
+  return ((data ?? []) as IndexedGiveaway[]).filter(
+    (g) => !isHiddenGiveaway(g.address)
+  );
 }
 
 export async function fetchGiveaway(
   address: string
 ): Promise<IndexedGiveaway | null> {
+  if (isHiddenGiveaway(address)) return null;
+
   const supabase = getSupabaseClient();
   if (!supabase) {
     // No Ponder indexer running — read directly from the chain. Falls through
