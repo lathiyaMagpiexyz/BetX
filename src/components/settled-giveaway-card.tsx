@@ -7,6 +7,7 @@ import {
 } from "@/lib/format";
 import { ENTRY_TOKEN_SYMBOL, ENTRY_TOKEN_DECIMALS } from "@/lib/contracts";
 import type { IndexedGiveaway } from "@/lib/supabase";
+import { isHiddenGiveaway } from "@/lib/hidden-giveaways";
 
 interface Props {
   giveaway: IndexedGiveaway;
@@ -25,6 +26,9 @@ function settledAgo(endAt: string): string {
 }
 
 export function SettledGiveawayCard({ giveaway, prices }: Props) {
+  // Render-layer blocklist. See GiveawayCard for rationale.
+  if (isHiddenGiveaway(giveaway.address)) return null;
+
   const prizePool = BigInt(giveaway.prize_pool);
   const prizeSymbol = giveaway.prize_token_symbol ?? ENTRY_TOKEN_SYMBOL;
   const prizeDecimals = giveaway.prize_token_decimals ?? ENTRY_TOKEN_DECIMALS;

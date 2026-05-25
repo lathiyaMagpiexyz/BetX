@@ -17,15 +17,6 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// Belt-and-suspenders blocklist applied at the page level, in addition to the
-// filter in `src/lib/supabase.ts`. The upstream filter wasn't taking effect on
-// Vercel for the listing path (cached lambda or data cache suspected), so we
-// enforce here too — the page filter can't be bypassed by upstream caching.
-const HIDDEN_GIVEAWAYS = new Set<string>([
-  "0xa148913ac207840a8c6f2dd833c794934316d211",
-]);
-const isHidden = (addr: string) => HIDDEN_GIVEAWAYS.has(addr.toLowerCase());
-
 const FACTORY = process.env.NEXT_PUBLIC_GIVEAWAY_FACTORY_ADDRESS;
 const factoryConfigured =
   !!FACTORY &&
@@ -45,13 +36,11 @@ export default async function GiveawaysPage() {
   // Live token prices fetched server-side (CoinGecko, 60s cache) so card
   // USD figures match the detail page instead of using stale tokens.ts
   // constants via prize_token_usd_price.
-  const [liveRaw, settledRaw, prices] = await Promise.all([
+  const [live, settled, prices] = await Promise.all([
     fetchActiveGiveaways(),
     fetchSettledGiveaways(12),
     fetchTokenPrices(),
   ]);
-  const live = liveRaw.filter((g) => !isHidden(g.address));
-  const settled = settledRaw.filter((g) => !isHidden(g.address));
 
   return (
     <main className="container mx-auto px-4 py-16">

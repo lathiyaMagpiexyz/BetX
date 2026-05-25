@@ -9,6 +9,7 @@ import {
 } from "@/lib/format";
 import { ENTRY_TOKEN_SYMBOL, ENTRY_TOKEN_DECIMALS } from "@/lib/contracts";
 import type { IndexedGiveaway } from "@/lib/supabase";
+import { isHiddenGiveaway } from "@/lib/hidden-giveaways";
 
 interface GiveawayCardProps {
   giveaway: IndexedGiveaway;
@@ -20,6 +21,10 @@ interface GiveawayCardProps {
 }
 
 export function GiveawayCard({ giveaway, prices }: GiveawayCardProps) {
+  // Render-layer blocklist. Final guard — no data-layer cache (Vercel data
+  // cache, Supabase HTTP cache, indexer staleness) can route around this.
+  if (isHiddenGiveaway(giveaway.address)) return null;
+
   // Prize pool is fixed at sponsor-set tier amounts. Entry fees are NOT added
   // to the pool — they stay in the contract as sponsor revenue.
   const totalPool = BigInt(giveaway.prize_pool);
